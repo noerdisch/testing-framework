@@ -17,4 +17,4 @@ namespace TYPO3\CMS\Core\Tests\Functional\DataHandling\Framework;
 /**
  * @deprecated since TYPO3 9, will be removed in TYPO3 10
  */
-class ActionService extends \TYPO3\TestingFramework\Core\Functional\Framework\DataHandling\ActionService {}
+class ActionService extends \Noerdisch\TestingFramework\Core\Functional\Framework\DataHandling\ActionService {}

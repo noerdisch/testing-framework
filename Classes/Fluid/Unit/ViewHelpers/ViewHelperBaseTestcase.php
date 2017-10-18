@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\TestingFramework\Fluid\Unit\ViewHelpers;
+namespace Noerdisch\TestingFramework\Fluid\Unit\ViewHelpers;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -25,7 +25,7 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\ViewHelperVariableContainer;
 /**
  * Base test class for testing view helpers
  */
-abstract class ViewHelperBaseTestcase extends \TYPO3\TestingFramework\Core\Unit\UnitTestCase
+abstract class ViewHelperBaseTestcase extends \Noerdisch\TestingFramework\Core\Unit\UnitTestCase
 {
     /**
      * @var ViewHelperVariableContainer|ObjectProphecy

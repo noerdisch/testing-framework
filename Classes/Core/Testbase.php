@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\TestingFramework\Core;
+namespace Noerdisch\TestingFramework\Core;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -496,7 +496,7 @@ class Testbase
      *
      * @param string $databaseName Database name of this test instance
      * @param string $originalDatabaseName Original database name before suffix was added
-     * @throws \TYPO3\TestingFramework\Core\Exception
+     * @throws \Noerdisch\TestingFramework\Core\Exception
      * @return void
      */
     public function setUpTestDatabase($databaseName, $originalDatabaseName)

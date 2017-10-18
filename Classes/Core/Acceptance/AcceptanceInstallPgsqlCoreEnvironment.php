@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace TYPO3\TestingFramework\Core\Acceptance;
+namespace Noerdisch\TestingFramework\Core\Acceptance;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -19,7 +19,7 @@ use Codeception\Event\SuiteEvent;
 use Codeception\Events;
 use Codeception\Extension;
 use Doctrine\DBAL\DriverManager;
-use TYPO3\TestingFramework\Core\Testbase;
+use Noerdisch\TestingFramework\Core\Testbase;
 
 /**
  * This codeception extension creates a basic TYPO3 instance within

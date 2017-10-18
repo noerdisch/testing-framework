@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace TYPO3\TestingFramework\Core\Functional\Framework\DataHandling;
+namespace Noerdisch\TestingFramework\Core\Functional\Framework\DataHandling;
 
 /*
  * This file is part of the TYPO3 CMS project.

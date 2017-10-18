@@ -13,7 +13,7 @@ extensions:
   enabled:
     - Codeception\Extension\RunFailed
     - Codeception\Extension\Recorder
-    - TYPO3\TestingFramework\Core\Acceptance\AcceptanceCoreEnvironment
+    - Noerdisch\TestingFramework\Core\Acceptance\AcceptanceCoreEnvironment
 groups:
   AcceptanceTests-Job-*: Configuration/Acceptance/AcceptanceTests-Job-*
 

@@ -12,4 +12,4 @@ extensions:
   enabled:
     - Codeception\Extension\RunFailed
     - Codeception\Extension\Recorder
-    - TYPO3\TestingFramework\Core\Acceptance\AcceptanceInstallMysqlCoreEnvironment
+    - Noerdisch\TestingFramework\Core\Acceptance\AcceptanceInstallMysqlCoreEnvironment

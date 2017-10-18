@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\TestingFramework\Core\Functional;
+namespace Noerdisch\TestingFramework\Core\Functional;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -23,11 +23,11 @@ use TYPO3\CMS\Core\Cache\Backend\NullBackend;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\TestingFramework\Core\BaseTestCase;
-use TYPO3\TestingFramework\Core\Exception;
-use TYPO3\TestingFramework\Core\Functional\Framework\DataHandling\DataSet;
-use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\Response;
-use TYPO3\TestingFramework\Core\Testbase;
+use Noerdisch\TestingFramework\Core\BaseTestCase;
+use Noerdisch\TestingFramework\Core\Exception;
+use Noerdisch\TestingFramework\Core\Functional\Framework\DataHandling\DataSet;
+use Noerdisch\TestingFramework\Core\Functional\Framework\Frontend\Response;
+use Noerdisch\TestingFramework\Core\Testbase;
 
 /**
  * Base test case class for functional tests, all TYPO3 CMS

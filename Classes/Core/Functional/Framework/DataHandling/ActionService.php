@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace TYPO3\TestingFramework\Core\Functional\Framework\DataHandling;
+namespace Noerdisch\TestingFramework\Core\Functional\Framework\DataHandling;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -21,7 +21,7 @@ use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
 use TYPO3\CMS\Workspaces\Service\WorkspaceService;
-use TYPO3\TestingFramework\Core\Exception;
+use Noerdisch\TestingFramework\Core\Exception;
 
 /**
  * DataHandler Actions
