@@ -1,6 +1,6 @@
 {
-  "name": "typo3/testing-framework",
-  "description": "The TYPO3 testing framework provides base classes for unit, functional and acceptance testing.",
+  "name": "noerdisch-testing-framework",
+  "description": "The noerdisch testing framework provides base classes for unit, functional and acceptance testing. Fork of TYPO3 testing framework to be TYPO3 7.6 compatible",
   "keywords": [
     "typo3",
     "testing",
@@ -18,6 +18,11 @@
       "name": "The TYPO3 Community",
       "role": "Contributor",
       "homepage": "https://typo3.org/community/"
+    },
+    {
+      "name": "Noerdisch GmbH",
+      "role": "Developer",
+      "homepage": "https://noerdisch.de"
     }
   ],
   "support": {
@@ -44,7 +49,7 @@
   },
   "autoload": {
     "psr-4": {
-      "TYPO3\\TestingFramework\\": "Classes/",
+      "Noerdisch\\TestingFramework\\": "Classes/",
       "TYPO3\\CMS\\Core\\Tests\\": "compat/core/",
       "TYPO3\\CMS\\Fluid\\Tests\\": "compat/fluid/"
     }
