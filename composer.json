@@ -35,11 +35,9 @@
     "phpunit/phpunit": "^6.2",
     "mikey179/vfsStream": "~1.6.0",
     "typo3fluid/fluid": "^2.2",
-    "typo3/cms-core": "^7.6 || ^8.5 || ^9",
-    "typo3/cms-backend": "^7.6 || ^8.5 || ^9",
-    "typo3/cms-frontend": "^7.6 || ^8.5 || ^9",
-    "typo3/cms-extbase": "^7.6 || ^8.5 || ^9",
-    "typo3/cms-fluid": "^7.6 || ^8.5 || ^9"
+    "codeception/codeception": "^2.3",
+    "typo3/cms-styleguide": "^8.0",
+    "se/selenium-server-standalone": "^3.6"
   },
   "suggest": {
     "codeception/codeception": "^2.2",
