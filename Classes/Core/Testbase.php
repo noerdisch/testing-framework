@@ -100,7 +100,7 @@ class Testbase
     public function defineSitePath()
     {
         define('PATH_site', $this->getWebRoot());
-        define('PATH_thisScript', PATH_site . 'typo3/index.php');
+        define('PATH_thisScript', PATH_site . 'typo3/cli_dispatch.phpsh');
         $_SERVER['SCRIPT_NAME'] = PATH_thisScript;
 
         if (!file_exists(PATH_thisScript)) {
