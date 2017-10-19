@@ -9,8 +9,6 @@ return array(
     'phpDocumentor\\Reflection\\' => array($vendorDir . '/phpdocumentor/reflection-common/src', $vendorDir . '/phpdocumentor/type-resolver/src', $vendorDir . '/phpdocumentor/reflection-docblock/src'),
     'Webmozart\\Assert\\' => array($vendorDir . '/webmozart/assert/src'),
     'TYPO3\\CMS\\Styleguide\\' => array($vendorDir . '/typo3/cms-styleguide/Classes'),
-    'TYPO3\\CMS\\Fluid\\Tests\\' => array($baseDir . '/compat/fluid'),
-    'TYPO3\\CMS\\Core\\Tests\\' => array($baseDir . '/compat/core'),
     'TYPO3Fluid\\Fluid\\' => array($vendorDir . '/typo3fluid/fluid/src'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'Symfony\\Component\\Yaml\\' => array($vendorDir . '/symfony/yaml'),

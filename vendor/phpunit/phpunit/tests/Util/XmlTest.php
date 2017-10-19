@@ -8,12 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace PHPUnit\Util;
-
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\Exception;
-
-class XmlTest extends TestCase
+class Util_XMLTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider charProvider
@@ -22,18 +17,18 @@ class XmlTest extends TestCase
     {
         $e = null;
 
-        $escapedString = Xml::prepareString($char);
+        $escapedString = PHPUnit_Util_XML::prepareString($char);
         $xml           = "<?xml version='1.0' encoding='UTF-8' ?><tag>$escapedString</tag>";
-        $dom           = new \DOMDocument('1.0', 'UTF-8');
+        $dom           = new DomDocument('1.0', 'UTF-8');
 
         try {
             $dom->loadXML($xml);
         } catch (Exception $e) {
         }
 
-        $this->assertNull($e, \sprintf(
+        $this->assertNull($e, sprintf(
             'PHPUnit_Util_XML::prepareString("\x%02x") should not crash DomDocument',
-            \ord($char)
+            ord($char)
         ));
     }
 
@@ -42,40 +37,43 @@ class XmlTest extends TestCase
         $data = [];
 
         for ($i = 0; $i < 256; $i++) {
-            $data[] = [\chr($i)];
+            $data[] = [chr($i)];
         }
 
         return $data;
     }
 
+    /**
+     * @expectedException PHPUnit_Framework_Exception
+     * @expectedExceptionMessage Could not load XML from empty string
+     */
     public function testLoadEmptyString()
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Could not load XML from empty string');
-
-        Xml::load('');
+        PHPUnit_Util_XML::load('');
     }
 
+    /**
+     * @expectedException PHPUnit_Framework_Exception
+     * @expectedExceptionMessage Could not load XML from array
+     */
     public function testLoadArray()
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Could not load XML from array');
-
-        Xml::load([1, 2, 3]);
+        PHPUnit_Util_XML::load([1, 2, 3]);
     }
 
+    /**
+     * @expectedException PHPUnit_Framework_Exception
+     * @expectedExceptionMessage Could not load XML from boolean
+     */
     public function testLoadBoolean()
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Could not load XML from boolean');
-
-        Xml::load(false);
+        PHPUnit_Util_XML::load(false);
     }
 
     public function testNestedXmlToVariable()
     {
         $xml = '<array><element key="a"><array><element key="b"><string>foo</string></element></array></element><element key="c"><string>bar</string></element></array>';
-        $dom = new \DOMDocument;
+        $dom = new DOMDocument();
         $dom->loadXML($xml);
 
         $expected = [
@@ -85,33 +83,8 @@ class XmlTest extends TestCase
             'c' => 'bar',
         ];
 
-        $actual = Xml::xmlToVariable($dom->documentElement);
+        $actual = PHPUnit_Util_XML::xmlToVariable($dom->documentElement);
 
         $this->assertSame($expected, $actual);
-    }
-
-    public function testXmlToVariableCanHandleMultipleOfTheSameArgumentType()
-    {
-        $xml = '<object class="SampleClass"><arguments><string>a</string><string>b</string><string>c</string></arguments></object>';
-        $dom = new \DOMDocument();
-        $dom->loadXML($xml);
-
-        $expected = ['a' => 'a', 'b' => 'b', 'c' => 'c'];
-
-        $actual = Xml::xmlToVariable($dom->documentElement);
-
-        $this->assertSame($expected, (array) $actual);
-    }
-
-    public function testXmlToVariableCanConstructObjectsWithConstructorArgumentsRecursively()
-    {
-        $xml = '<object class="Exception"><arguments><string>one</string><integer>0</integer><object class="Exception"><arguments><string>two</string></arguments></object></arguments></object>';
-        $dom = new \DOMDocument();
-        $dom->loadXML($xml);
-
-        $actual = Xml::xmlToVariable($dom->documentElement);
-
-        $this->assertEquals('one', $actual->getMessage());
-        $this->assertEquals('two', $actual->getPrevious()->getMessage());
     }
 }
