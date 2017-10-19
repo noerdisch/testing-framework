@@ -47,9 +47,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Noerdisch\\TestingFramework\\": "Classes/",
-      "TYPO3\\CMS\\Core\\Tests\\": "compat/core/",
-      "TYPO3\\CMS\\Fluid\\Tests\\": "compat/fluid/"
+      "Noerdisch\\TestingFramework\\": "Classes/"
     }
   }
 }
