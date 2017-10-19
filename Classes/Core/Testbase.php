@@ -527,6 +527,20 @@ class Testbase
     }
 
     /**
+     * Bootstrap the autoloader for the typo3 instance web root.
+     * When starting tasks from the noerdisch-testing-framework phpunit the autoloader
+     * does not resolve the classes of the TYPO3 instance. So we initialize the class loader manually.
+     *
+     * @return void
+     */
+    public function initializeClassLoader()
+    {
+        $webRoot = $this->getWebRoot();
+        $classLoader = require rtrim(realpath($webRoot), '\\/') . '/vendor/autoload.php';
+        Bootstrap::getInstance()->initializeClassLoader($classLoader);
+    }
+
+    /**
      * Bootstrap basic TYPO3. This bootstraps TYPO3 far enough to initialize database afterwards.
      * For functional and acceptance tests.
      *

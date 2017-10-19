@@ -19,6 +19,7 @@
  */
 call_user_func(function () {
     $testbase = new \Noerdisch\TestingFramework\Core\Testbase();
+    $testbase->initializeClassLoader();
     $testbase->enableDisplayErrors();
     $testbase->defineOriginalRootPath();
     $testbase->createDirectory(ORIGINAL_ROOT . 'typo3temp/var/tests');
