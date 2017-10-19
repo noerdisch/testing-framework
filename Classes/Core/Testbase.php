@@ -775,7 +775,7 @@ class Testbase
             // @deprecated
             $webRoot = getenv('TYPO3_PATH_WEB');
         } else {
-            $webRoot = dirname(dirname(dirname(getcwd())));
+            $webRoot = getcwd();
         }
         return rtrim(strtr($webRoot, '\\', '/'), '/') . '/';
     }
