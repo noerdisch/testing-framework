@@ -1,4 +1,5 @@
 <?php
+
 namespace Noerdisch\TestingFramework\Core;
 
 /*
@@ -62,9 +63,14 @@ class Testbase
      *
      * @return void
      */
-    public function initializeCodeceptionAutoloader() {
+    public function initializeCodeceptionAutoloader()
+    {
         $webRoot = $this->getWebRoot();
         Autoload::addNamespace('TYPO3\\CMS\\Core', $webRoot . '/typo3/sysext/core/Classes');
+        Autoload::addNamespace(
+            'TYPO3\\CMS\\Saltedpasswords',
+            $webRoot . '/typo3/sysext/saltedpasswords/Classes'
+        );
     }
 
     /**
@@ -104,6 +110,18 @@ class Testbase
             }
             define('TYPO3_OS', $typoOs);
         }
+    }
+
+    /**
+     * Initialize several globals variables
+     */
+    public function initializeGlobalVariables()
+    {
+        // Unset variable(s) in global scope (security issue #13959)
+        $GLOBALS['TYPO3_MISC'] = [];
+        $GLOBALS['T3_VAR'] = [];
+        $GLOBALS['T3_SERVICES'] = [];
+        $GLOBALS['T3_VAR']['getUserObj'] = [];
     }
 
     /**
@@ -462,7 +480,8 @@ class Testbase
         array $defaultCoreExtensionsToLoad,
         array $additionalCoreExtensionsToLoad,
         array $testExtensionPaths
-    ) {
+    )
+    {
         $packageStates = [
             'packages' => [],
             'version' => 5,
@@ -570,7 +589,6 @@ class Testbase
         $classLoader = require rtrim(realpath($instancePath . '/typo3'), '\\/') . '/../vendor/autoload.php';
         Bootstrap::getInstance()
             ->initializeClassLoader($classLoader)
-            ->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI)
             ->baseSetup()
             ->loadConfigurationAndInitialize(true);
         $this->dumpClassLoadingInformation();
@@ -619,7 +637,9 @@ class Testbase
      */
     public function loadExtensionTables()
     {
-        Bootstrap::getInstance()->loadBaseTca()->loadExtTables();
+        Bootstrap::getInstance()
+            ->loadCachedTca()
+            ->loadExtensionTables();
     }
 
     /**
@@ -825,7 +845,7 @@ class Testbase
         if (strpos($path, 'EXT:') === 0) {
             $path = GeneralUtility::getFileAbsFileName($path);
         } elseif (strpos($path, 'PACKAGE:') === 0) {
-            $path = $this->getPackagesPath() . str_replace('PACKAGE:', '',$path);
+            $path = $this->getPackagesPath() . str_replace('PACKAGE:', '', $path);
         }
         return $path;
     }
