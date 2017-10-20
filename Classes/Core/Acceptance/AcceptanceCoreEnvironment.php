@@ -161,6 +161,7 @@ class AcceptanceCoreEnvironment extends Extension
     {
         $testbase = new Testbase();
         $testbase->enableDisplayErrors();
+        $testbase->initializeCodeceptionAutoloader();
         $testbase->defineBaseConstants();
         $testbase->defineOriginalRootPath();
         $testbase->createDirectory(ORIGINAL_ROOT . 'typo3temp/var/tests/acceptance');

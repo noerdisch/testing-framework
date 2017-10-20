@@ -14,6 +14,7 @@ namespace Noerdisch\TestingFramework\Core;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Codeception\Util\Autoload;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
@@ -50,6 +51,20 @@ class Testbase
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             die('This script supports command line usage only. Please check your command.');
         }
+    }
+
+    /**
+     * The codeception is installed not in the TYPO3 CMS scope and therefore we need to add
+     * the TYPO3 namespace to the Codeception.
+     *
+     * Luckily Codeception offers a util for autoloading.
+     * So we can add all namespaces to codeception we need.
+     *
+     * @return void
+     */
+    public function initializeCodeceptionAutoloader() {
+        $webRoot = $this->getWebRoot();
+        Autoload::addNamespace('TYPO3\\CMS\\Core', $webRoot . '/typo3/sysext/core/Classes');
     }
 
     /**
