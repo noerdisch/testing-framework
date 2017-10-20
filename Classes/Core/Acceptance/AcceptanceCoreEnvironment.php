@@ -163,6 +163,8 @@ class AcceptanceCoreEnvironment extends Extension
         $testbase->enableDisplayErrors();
         $testbase->initializeCodeceptionAutoloader();
         $testbase->defineBaseConstants();
+        $testbase->defineSitePath();
+        $testbase->initializeGlobalVariables();
         $testbase->defineOriginalRootPath();
         $testbase->createDirectory(ORIGINAL_ROOT . 'typo3temp/var/tests/acceptance');
         $testbase->createDirectory(ORIGINAL_ROOT . 'typo3temp/var/transient');
@@ -191,11 +193,11 @@ class AcceptanceCoreEnvironment extends Extension
         );
         $testbase->linkTestExtensionsToInstance($instancePath, $testExtensionsToLoad);
         $testbase->linkPathsInTestInstance($instancePath, $this->pathsToLinkInTestInstance);
-        $localConfiguration['DB'] = $testbase->getOriginalDatabaseSettingsFromEnvironmentOrLocalConfiguration();
-        $originalDatabaseName = $localConfiguration['DB']['Connections']['Default']['dbname'];
+        //$localConfiguration['DB'] = $testbase->getOriginalDatabaseSettingsFromEnvironmentOrLocalConfiguration();
+        //$originalDatabaseName = $localConfiguration['DB']['Connections']['Default']['dbname'];
         // Append the unique identifier to the base database name to end up with a single database per test case
-        $localConfiguration['DB']['Connections']['Default']['dbname'] = $originalDatabaseName . '_at';
-        $testbase->testDatabaseNameIsNotTooLong($originalDatabaseName, $localConfiguration);
+        //$localConfiguration['DB']['Connections']['Default']['dbname'] = $originalDatabaseName . '_at';
+        //$testbase->testDatabaseNameIsNotTooLong($originalDatabaseName, $localConfiguration);
         // Set some hard coded base settings for the instance. Those could be overruled by
         // $this->configurationToUseInTestInstance if needed again.
         $localConfiguration['BE']['debug'] = true;
@@ -237,9 +239,9 @@ class AcceptanceCoreEnvironment extends Extension
         ];
         $testbase->setUpPackageStates($instancePath, $defaultCoreExtensionsToLoad, $this->coreExtensionsToLoad, $testExtensionsToLoad);
         $testbase->setUpBasicTypo3Bootstrap($instancePath);
-        $testbase->setUpTestDatabase($localConfiguration['DB']['Connections']['Default']['dbname'], $originalDatabaseName);
+        //$testbase->setUpTestDatabase($localConfiguration['DB']['Connections']['Default']['dbname'], $originalDatabaseName);
         $testbase->loadExtensionTables();
-        $testbase->createDatabaseStructure();
+        //$testbase->createDatabaseStructure();
 
         // Unset a closure or phpunit kicks in with a 'serialization of \Closure is not allowed'
         // Alternative solution:
@@ -248,7 +250,7 @@ class AcceptanceCoreEnvironment extends Extension
         $suite->setBackupGlobals(false);
 
         foreach ($this->xmlDatabaseFixtures as $fixture) {
-            $testbase->importXmlDatabaseFixture($fixture);
+            //$testbase->importXmlDatabaseFixture($fixture);
         }
 
         // styleguide generator uses DataHandler for some parts. DataHandler needs an initialized BE user
@@ -291,8 +293,8 @@ class AcceptanceCoreEnvironment extends Extension
     {
         $password = getenv('typo3InstallToolPassword');
         if (!empty($password)) {
-            $saltFactory = \TYPO3\CMS\Saltedpasswords\Salt\SaltFactory::getSaltingInstance(null, 'BE');
-            return $saltFactory->getHashedPassword($password);
+            //$saltFactory = \TYPO3\CMS\Saltedpasswords\Salt\SaltFactory::getSaltingInstance(null, 'BE');
+            return 'adminpassword';//$saltFactory->getHashedPassword($password);
         } else {
             return '$P$notnotnotnotnotnot.validvalidva';
         }
