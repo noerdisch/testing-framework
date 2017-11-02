@@ -27,8 +27,8 @@ Now your testing framework should be installed.
 
 Since TYPO3 supports composer it is really easy to install extensions via CLI.
 
-```
-$ composer require typo3/testing-framework
+```bash
+composer require noerdisch/testing-framework
 ```
 
 
@@ -42,18 +42,18 @@ We mentioned already that the framework enables you to easily test your extensio
 You don`t have to install phpunit on your machine. The testing framework comes with phpunit and codeception.
 So after installing the testing framework you are ready to go. For excecuting all core unit tests just enter the following command from your TYPO3 instance root.
 
-```
+```bash
 ./typo3conf/ext/noerdisch-testing-framework/bin/phpunit -c typo3conf/ext/noerdisch-testing-framework/Resources/Core/Build/UnitTests.xml
 ```
 
 You can also execute single unit tests or only for one extension.
 You only need to append the path to the test file or the extension folder.
 
-```
+```bash
 ./typo3conf/ext/noerdisch-testing-framework/bin/phpunit -c typo3conf/ext/noerdisch-testing-framework/Resources/Core/Build/UnitTests.xml typo3conf/ext/<YourExtensionName>/Tests/Unit
 ```
 
-```
+```bash
 ./typo3conf/ext/noerdisch-testing-framework/bin/phpunit -c typo3conf/ext/noerdisch-testing-framework/Resources/Core/Build/UnitTests.xml typo3conf/ext/<YourExtensionName>/Tests/Unit/SingleTest.php
 ```
 
@@ -69,12 +69,12 @@ Functional test are also executed via phpunit. Functional tests need database cr
 * typo3DatabasePort (when not using the default port 3306)
 * TYPO3_PATH_ROOT (when calling the script outsite the TYPO3 instance)
 
-```
+```bash
 typo3DatabaseName="fooDB" typo3DatabaseUsername="typo3" typo3DatabasePassword="supersecret" typo3DatabaseHost="127.0.0.1" typo3InstallToolPassword="supersecret" ./typo3conf/ext/noerdisch-testing-framework/bin/phpunit -c typo3conf/ext/noerdisch-testing-framework/Resources/Core/Build/FunctionalTests.xml
 ```
 
 Of course you can also execute single functional tests. Unit tests and functional tests works CLI wise the same. Just append the path to an extension or a single functional test.
 
-```
+```bash
 typo3DatabaseName="fooDB" typo3DatabaseUsername="typo3" typo3DatabasePassword="supersecret" typo3DatabaseHost="127.0.0.1" typo3InstallToolPassword="supersecret" ./typo3conf/ext/noerdisch-testing-framework/bin/phpunit -c typo3conf/ext/noerdisch-testing-framework/Resources/Core/Build/FunctionalTests.xml typo3/sysext/core/Tests/Functional/Page
 ```
