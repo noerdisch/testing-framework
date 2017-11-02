@@ -1,6 +1,7 @@
 {
   "name": "noerdisch-testing-framework",
   "description": "The noerdisch testing framework provides base classes for unit, functional and acceptance testing. Fork of TYPO3 testing framework to be TYPO3 7.6 compatible",
+  "version": "1.0.0-beta",
   "keywords": [
     "typo3",
     "testing",
