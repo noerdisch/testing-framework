@@ -1,0 +1,28 @@
+<phpunit
+	backupGlobals="true"
+	backupStaticAttributes="false"
+	bootstrap="UnitTestsBootstrap.php"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertWarningsToExceptions="true"
+	convertDeprecationsToExceptions="false"
+	forceCoversAnnotation="false"
+	processIsolation="false"
+	stopOnError="false"
+	stopOnFailure="false"
+	stopOnIncomplete="false"
+	stopOnSkipped="false"
+	verbose="false"
+	beStrictAboutTestsThatDoNotTestAnything="false"
+>
+	<testsuites>
+		<testsuite name="Core tests">
+			<directory>../../../../../../typo3/sysext/*/Tests/UnitDeprecated/</directory>
+		</testsuite>
+	</testsuites>
+    <filter>
+        <whitelist>
+            <directory>../../../../../../typo3/sysext/*/Classes/</directory>
+        </whitelist>
+    </filter>
+</phpunit>

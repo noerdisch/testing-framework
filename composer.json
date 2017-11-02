@@ -1,0 +1,55 @@
+{
+  "name": "noerdisch-testing-framework",
+  "description": "The noerdisch testing framework provides base classes for unit, functional and acceptance testing. Fork of TYPO3 testing framework to be TYPO3 7.6 compatible",
+  "version": "1.0.0-beta",
+  "keywords": [
+    "typo3",
+    "testing",
+    "tests"
+  ],
+  "homepage": "https://typo3.org/",
+  "license": "GPL-2.0+",
+  "authors": [
+    {
+      "name": "TYPO3 CMS Core Team",
+      "role": "Developer",
+      "homepage": "https://forge.typo3.org/projects/typo3cms-core"
+    },
+    {
+      "name": "The TYPO3 Community",
+      "role": "Contributor",
+      "homepage": "https://typo3.org/community/"
+    },
+    {
+      "name": "Noerdisch GmbH",
+      "role": "Developer",
+      "homepage": "https://noerdisch.de"
+    }
+  ],
+  "support": {
+    "general": "https://typo3.org/support/",
+    "issues": "https://forge.typo3.org",
+    "irc": "irc://irc.freenode.net/#typo3-cms",
+    "news": "nntp://lists.typo3.org"
+  },
+  "require": {
+    "phpunit/phpunit": "^4.8",
+    "mikey179/vfsStream": "~1.6.0",
+    "typo3fluid/fluid": "^2.2",
+    "codeception/codeception": "^2.2",
+    "typo3/cms-styleguide": "^8.0",
+    "se/selenium-server-standalone": "^3.6",
+    "psychomieze/parallel-phpunit-resultPrinter": "*@dev"
+  },
+  "suggest": {
+    "codeception/codeception": "^2.2",
+    "se/selenium-server-standalone": "~2.53",
+    "typo3/cms-saltedpasswords": "^8.5",
+    "typo3/cms-styleguide": "~8.0.8"
+  },
+  "autoload": {
+    "psr-4": {
+      "Noerdisch\\TestingFramework\\": "Classes/"
+    }
+  }
+}
