@@ -550,7 +550,7 @@ class PHPUnit_TextUI_Command
 
         if (isset($this->arguments['configuration']) &&
             is_dir($this->arguments['configuration'])) {
-            $configurationFile = $this->arguments['configuration'] . '/phpunit.xml';
+            $configurationFile = $this->arguments['configuration'] . '/UnitTests.xml';
 
             if (file_exists($configurationFile)) {
                 $this->arguments['configuration'] = realpath(
@@ -563,11 +563,11 @@ class PHPUnit_TextUI_Command
             }
         } elseif (!isset($this->arguments['configuration']) &&
                   $this->arguments['useDefaultConfiguration']) {
-            if (file_exists('phpunit.xml')) {
-                $this->arguments['configuration'] = realpath('phpunit.xml');
-            } elseif (file_exists('phpunit.xml.dist')) {
+            if (file_exists('UnitTests.xml')) {
+                $this->arguments['configuration'] = realpath('UnitTests.xml');
+            } elseif (file_exists('UnitTests.xml.dist')) {
                 $this->arguments['configuration'] = realpath(
-                    'phpunit.xml.dist'
+                    'UnitTests.xml.dist'
                 );
             }
         }
@@ -966,7 +966,7 @@ Configuration Options:
 
   --bootstrap <file>        A "bootstrap" PHP file that is run before the tests.
   -c|--configuration <file> Read configuration from XML file.
-  --no-configuration        Ignore default configuration file (phpunit.xml).
+  --no-configuration        Ignore default configuration file (UnitTests.xml).
   --no-coverage             Ignore code coverage configuration.
   --include-path <path(s)>  Prepend PHP's include_path with given path(s).
   -d key[=value]            Sets a php.ini value.

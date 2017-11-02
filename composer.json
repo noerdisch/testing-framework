@@ -37,7 +37,8 @@
     "typo3fluid/fluid": "^2.2",
     "codeception/codeception": "^2.2",
     "typo3/cms-styleguide": "^8.0",
-    "se/selenium-server-standalone": "^3.6"
+    "se/selenium-server-standalone": "^3.6",
+    "psychomieze/parallel-phpunit-resultPrinter": "*@dev"
   },
   "suggest": {
     "codeception/codeception": "^2.2",
