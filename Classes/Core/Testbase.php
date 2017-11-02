@@ -526,9 +526,11 @@ class Testbase
      */
     public function initializeClassLoader()
     {
-        $webRoot = $this->getWebRoot();
-        $classLoader = require rtrim(realpath($webRoot), '\\/') . '/typo3_src/vendor/autoload.php';
-        Bootstrap::getInstance()->initializeClassLoader($classLoader);
+        $autoloadFile = $this->getVendorPath() . 'autoload.php';
+        if (!is_file($autoloadFile)) {
+            $classLoader = require $autoloadFile;
+            Bootstrap::getInstance()->initializeClassLoader($classLoader);
+        }
     }
 
     /**
@@ -537,21 +539,53 @@ class Testbase
      *
      * @param string $instancePath Absolute path to test instance
      * @return void
+     * @throws \Noerdisch\TestingFramework\Core\Exception
      */
     public function setUpBasicTypo3Bootstrap($instancePath)
     {
         $_SERVER['PWD'] = $instancePath;
         $_SERVER['argv'][0] = 'index.php';
 
-        $classLoader = require rtrim(realpath($instancePath . '/typo3'), '\\/') . '/../vendor/autoload.php';
-        Bootstrap::getInstance()
-            ->initializeClassLoader($classLoader)
-            ->baseSetup()
-            ->loadConfigurationAndInitialize(true);
-        $this->dumpClassLoadingInformation();
-        Bootstrap::getInstance()->loadTypo3LoadedExtAndExtLocalconf(true)
-            ->setFinalCachingFrameworkCacheConfiguration()
-            ->unsetReservedGlobalVariables();
+        $autoloadFile = $this->getVendorPath() . 'autoload.php';
+        if (!is_file($autoloadFile)) {
+            $classLoader = require $autoloadFile;
+            Bootstrap::getInstance()
+                ->initializeClassLoader($classLoader)
+                ->baseSetup()
+                ->loadConfigurationAndInitialize(true);
+            $this->dumpClassLoadingInformation();
+            Bootstrap::getInstance()->loadTypo3LoadedExtAndExtLocalconf(true)
+                ->setFinalCachingFrameworkCacheConfiguration()
+                ->unsetReservedGlobalVariables();
+        }
+    }
+
+    /**
+     * For composer installations the vendor folder is part of the typo3_src and in archive based installations it
+     * is located in the web root of the TYPO3 instance. We need the vendor folder to get the classloader for instance.
+     *
+     * @throws Exception
+     * @return string
+     */
+    protected function getVendorPath()
+    {
+        $webRoot = $this->getWebRoot();
+        $vendorPath = rtrim(realpath($webRoot), '\\/') . '/typo3_src/vendor';
+
+        if (!is_dir($vendorPath)) {
+            // None composer installations (e.g. via archive) has the vendor in the webroot folder
+            $vendorPath = rtrim(realpath($webRoot), '\\/') . '/vendor';
+        }
+
+        if (!is_dir($vendorPath)) {
+            throw new Exception(
+                'Could not locate the TYPO3 autoload file. Please take care that the vendor folder is in the web root
+                folder or that us use typo3_src symlinks.',
+                1509639973
+            );
+        }
+
+        return $vendorPath . '/';
     }
 
     /**
@@ -625,11 +659,12 @@ class Testbase
      * Since we are installed in vendor dir, we can safely assume the path of the vendor
      * directory relative to this file
      *
+     * @throws \Noerdisch\TestingFramework\Core\Exception
      * @return string
      */
     protected function getPackagesPath()
     {
-        return $this->getWebRoot() . 'typo3_src/vendor/';
+        return $this->getVendorPath();
     }
 
     /**
