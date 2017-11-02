@@ -16,16 +16,8 @@ namespace Noerdisch\TestingFramework\Core;
  */
 
 use Codeception\Util\Autoload;
-use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
-use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
-use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Database\Schema\SchemaMigrator;
-use TYPO3\CMS\Core\Database\Schema\SqlReader;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -524,41 +516,6 @@ class Testbase
         }
     }
 
-    /**
-     * Create a low level connection to dbms, without selecting the target database.
-     * Drop existing database if it exists and create a new one.
-     *
-     * @param string $databaseName Database name of this test instance
-     * @param string $originalDatabaseName Original database name before suffix was added
-     * @throws \Noerdisch\TestingFramework\Core\Exception
-     * @return void
-     */
-    public function setUpTestDatabase($databaseName, $originalDatabaseName)
-    {
-        // Drop database if exists. Directly using the Doctrine DriverManager to
-        // work around connection caching in ConnectionPool
-        $connectionParameters = $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default'];
-        unset($connectionParameters['dbname']);
-        $schemaManager = DriverManager::getConnection($connectionParameters)->getSchemaManager();
-
-        if (in_array($databaseName, $schemaManager->listDatabases(), true)) {
-            $schemaManager->dropDatabase($databaseName);
-        }
-
-        try {
-            $schemaManager->createDatabase($databaseName);
-        } catch (DBALException $e) {
-            $user = $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['user'];
-            $host = $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['host'];
-            throw new Exception(
-                'Unable to create database with name ' . $databaseName . '. This is probably a permission problem.'
-                . ' For this instance this could be fixed executing:'
-                . ' GRANT ALL ON `' . $originalDatabaseName . '_%`.* TO `' . $user . '`@`' . $host . '`;'
-                . ' Original message thrown by database layer: ' . $e->getMessage(),
-                1376579070
-            );
-        }
-    }
 
     /**
      * Bootstrap the autoloader for the typo3 instance web root.
@@ -570,7 +527,7 @@ class Testbase
     public function initializeClassLoader()
     {
         $webRoot = $this->getWebRoot();
-        $classLoader = require rtrim(realpath($webRoot), '\\/') . '/vendor/autoload.php';
+        $classLoader = require rtrim(realpath($webRoot), '\\/') . '/typo3_src/vendor/autoload.php';
         Bootstrap::getInstance()->initializeClassLoader($classLoader);
     }
 
@@ -662,141 +619,6 @@ class Testbase
         $schemaMigrationService->importStaticData($insertStatements);
     }
 
-    /**
-     * Imports a data set represented as XML into the test database,
-     *
-     * @param string $path Absolute path to the XML file containing the data set to load
-     * @return void
-     * @throws \Doctrine\DBAL\DBALException
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
-     */
-    public function importXmlDatabaseFixture($path)
-    {
-        $path = $this->resolvePath($path);
-        if (!is_file($path)) {
-            throw new \RuntimeException(
-                'Fixture file ' . $path . ' not found',
-                1376746261
-            );
-        }
-
-        $fileContent = file_get_contents($path);
-        // Disables the functionality to allow external entities to be loaded when parsing the XML, must be kept
-        $previousValueOfEntityLoader = libxml_disable_entity_loader(true);
-        $xml = simplexml_load_string($fileContent);
-        libxml_disable_entity_loader($previousValueOfEntityLoader);
-        $foreignKeys = [];
-
-        /** @var $table \SimpleXMLElement */
-        foreach ($xml->children() as $table) {
-            $insertArray = [];
-
-            /** @var $column \SimpleXMLElement */
-            foreach ($table->children() as $column) {
-                $columnName = $column->getName();
-                $columnValue = null;
-
-                if (isset($column['ref'])) {
-                    list($tableName, $elementId) = explode('#', $column['ref']);
-                    $columnValue = $foreignKeys[$tableName][$elementId];
-                } elseif (isset($column['is-NULL']) && ($column['is-NULL'] === 'yes')) {
-                    $columnValue = null;
-                } else {
-                    $columnValue = (string)$table->$columnName;
-                }
-
-                $insertArray[$columnName] = $columnValue;
-            }
-
-            $tableName = $table->getName();
-            $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable($tableName);
-
-            // With mssql, hard setting uid auto-increment primary keys is only allowed if
-            // the table is prepared for such an operation beforehand
-            $platform = $connection->getDatabasePlatform();
-            $sqlServerIdentityDisabled = false;
-            if ($platform instanceof SQLServerPlatform) {
-                try {
-                    $connection->exec('SET IDENTITY_INSERT ' . $tableName . ' ON');
-                    $sqlServerIdentityDisabled = true;
-                } catch (\Doctrine\DBAL\DBALException $e) {
-                    // Some tables like sys_refindex don't have an auto-increment uid field and thus no
-                    // IDENTITY column. Instead of testing existance, we just try to set IDENTITY ON
-                    // and catch the possible error that occurs.
-                }
-            }
-
-            // Some DBMS like mssql are picky about inserting blob types with correct cast, setting
-            // types correctly (like Connection::PARAM_LOB) allows doctrine to create valid SQL
-            $types = [];
-            $tableDetails = $connection->getSchemaManager()->listTableDetails($tableName);
-            foreach ($insertArray as $columnName => $columnValue) {
-                $types[] = $tableDetails->getColumn($columnName)->getType()->getBindingType();
-            }
-
-            // Insert the row
-            $connection->insert($tableName, $insertArray, $types);
-
-            if ($sqlServerIdentityDisabled) {
-                // Reset identity if it has been changed
-                $connection->exec('SET IDENTITY_INSERT ' . $tableName . ' OFF');
-            }
-
-            static::resetTableSequences($connection, $tableName);
-
-            if (isset($table['id'])) {
-                $elementId = (string)$table['id'];
-                $foreignKeys[$tableName][$elementId] = $connection->lastInsertId($tableName);
-            }
-        }
-    }
-
-    /**
-     * Perform post processing of database tables after an insert has been performed.
-     * Doing this once per insert is rather slow, but due to the soft reference behavior
-     * this needs to be done after every row to ensure consistent results.
-     *
-     * @param \TYPO3\CMS\Core\Database\Connection $connection
-     * @param string $tableName
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    public static function resetTableSequences(Connection $connection, string $tableName)
-    {
-        if ($connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
-            $queryBuilder = $connection->createQueryBuilder();
-            $queryBuilder->getRestrictions()->removeAll();
-            $row = $queryBuilder->select('PGT.schemaname', 'S.relname', 'C.attname', 'T.relname AS tablename')
-                ->from('pg_class', 'S')
-                ->from('pg_depend', 'D')
-                ->from('pg_class', 'T')
-                ->from('pg_attribute', 'C')
-                ->from('pg_tables', 'PGT')
-                ->where(
-                    $queryBuilder->expr()->eq('S.relkind', $queryBuilder->quote('S')),
-                    $queryBuilder->expr()->eq('S.oid', $queryBuilder->quoteIdentifier('D.objid')),
-                    $queryBuilder->expr()->eq('D.refobjid', $queryBuilder->quoteIdentifier('T.oid')),
-                    $queryBuilder->expr()->eq('D.refobjid', $queryBuilder->quoteIdentifier('C.attrelid')),
-                    $queryBuilder->expr()->eq('D.refobjsubid', $queryBuilder->quoteIdentifier('C.attnum')),
-                    $queryBuilder->expr()->eq('T.relname', $queryBuilder->quoteIdentifier('PGT.tablename')),
-                    $queryBuilder->expr()->eq('PGT.tablename', $queryBuilder->quote($tableName))
-                )
-                ->setMaxResults(1)
-                ->execute()
-                ->fetch();
-
-            if ($row !== false) {
-                $connection->exec(
-                    sprintf(
-                        'SELECT SETVAL(%s, COALESCE(MAX(%s), 0)+1, FALSE) FROM %s',
-                        $connection->quote($row['schemaname'] . '.' . $row['relname']),
-                        $connection->quoteIdentifier($row['attname']),
-                        $connection->quoteIdentifier($row['schemaname'] . '.' . $row['tablename'])
-                    )
-                );
-            }
-        }
-    }
 
     /**
      * Get Path to vendor dir
@@ -805,9 +627,9 @@ class Testbase
      *
      * @return string
      */
-    protected function getPackagesPath(): string
+    protected function getPackagesPath()
     {
-        return rtrim(strtr(dirname(dirname(dirname(dirname(dirname(__DIR__))))), '\\', '/'), '/') . '/vendor/';
+        return $this->getWebRoot() . 'typo3_src/vendor/';
     }
 
     /**
@@ -826,6 +648,7 @@ class Testbase
         } else {
             $webRoot = getcwd();
         }
+
         return rtrim(strtr($webRoot, '\\', '/'), '/') . '/';
     }
 
@@ -840,7 +663,11 @@ class Testbase
         exit(1);
     }
 
-    protected function resolvePath(string $path)
+    /**
+     * @param string $path
+     * @return string
+     */
+    protected function resolvePath($path)
     {
         if (strpos($path, 'EXT:') === 0) {
             $path = GeneralUtility::getFileAbsFileName($path);
