@@ -28,19 +28,21 @@
  *      -c typo3conf/ext/noerdisch-testing-framework/Resources/Core/Build/UnitTests.xml
  *      typo3/sysext/core/Tests/Unit/DataHandling/DataHandlerTest.php
  */
+
 call_user_func(function () {
-    $testbase = new \Noerdisch\TestingFramework\Core\Testbase();
-    $testbase->initializeClassLoader();
-    $testbase->enableDisplayErrors();
-    $testbase->defineSitePath();
-    $testbase->defineTypo3ModeBe();
-    $testbase->setTypo3TestingContext();
-    $testbase->definePackagesPath();
-    $testbase->createDirectory(PATH_site . 'typo3conf/ext');
-    $testbase->createDirectory(PATH_site . 'typo3temp/assets');
-    $testbase->createDirectory(PATH_site . 'typo3temp/var/tests');
-    $testbase->createDirectory(PATH_site . 'typo3temp/var/transient');
-    $testbase->createDirectory(PATH_site . 'uploads');
+    /** @var \Noerdisch\TestingFramework\Core\Testbase $testbase */
+    $testBase = new Noerdisch\TestingFramework\Core\Testbase();
+    $testBase->initializeClassLoader();
+    $testBase->enableDisplayErrors();
+    $testBase->defineSitePath();
+    $testBase->defineTypo3ModeBe();
+    $testBase->setTypo3TestingContext();
+    $testBase->definePackagesPath();
+    $testBase->createDirectory(PATH_site . 'typo3conf/ext');
+    $testBase->createDirectory(PATH_site . 'typo3temp/assets');
+    $testBase->createDirectory(PATH_site . 'typo3temp/var/tests');
+    $testBase->createDirectory(PATH_site . 'typo3temp/var/transient');
+    $testBase->createDirectory(PATH_site . 'uploads');
 
     // disable TYPO3_DLOG
     define('TYPO3_DLOG', false);

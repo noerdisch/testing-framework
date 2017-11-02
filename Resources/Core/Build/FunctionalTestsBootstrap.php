@@ -18,10 +18,10 @@
  * with phpunit parameter --bootstrap if executing single test case classes.
  */
 call_user_func(function () {
-    $testbase = new \Noerdisch\TestingFramework\Core\Testbase();
-    $testbase->initializeClassLoader();
-    $testbase->enableDisplayErrors();
-    $testbase->defineOriginalRootPath();
-    $testbase->createDirectory(ORIGINAL_ROOT . 'typo3temp/var/tests');
-    $testbase->createDirectory(ORIGINAL_ROOT . 'typo3temp/var/transient');
+    $testBase = new \Noerdisch\TestingFramework\Core\Testbase();
+    $testBase->initializeClassLoader();
+    $testBase->enableDisplayErrors();
+    $testBase->defineOriginalRootPath();
+    $testBase->createDirectory(ORIGINAL_ROOT . 'typo3temp/var/tests');
+    $testBase->createDirectory(ORIGINAL_ROOT . 'typo3temp/var/transient');
 });
