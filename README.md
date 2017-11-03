@@ -1,3 +1,12 @@
+<p align="center">
+    <img src="https://cdn.rawgit.com/noerdisch/testing-framework/c60e5753/ext_icon.svg" height="100">
+</p>
+
+[![Packagist](https://img.shields.io/packagist/l/noerdisch/testing-framework.svg?style=flat-square)](https://packagist.org/packages/noerdisch/testing-framework)
+[![Packagist](https://img.shields.io/packagist/v/noerdisch/testing-framework.svg?style=flat-square)](https://packagist.org/packages/noerdisch/testing-framework)
+[![Twitter Follow](https://img.shields.io/twitter/follow/noerdisch.svg?style=social&label=Follow&style=flat-square)](https://twitter.com/noerdisch)
+
+
 # Nœrdisch testing framework for core and extensions
 
 
