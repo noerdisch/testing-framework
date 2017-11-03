@@ -1,6 +1,6 @@
 actor: Tester
 paths:
-  tests: ../../../../../../typo3/sysext/core/Tests
+  tests: ../../../Tests
   log: ../../../../../../typo3temp/var/tests/AcceptanceReports
   data: Configuration/Acceptance/Data
   support: Configuration/Acceptance/Support
