@@ -190,10 +190,6 @@ class ComposerStaticInita1ada698de71d4ac9544083ef1fce489
             array (
                 0 => __DIR__ . '/..' . '/phpspec/prophecy/src',
             ),
-            'Parallel' => 
-            array (
-                0 => __DIR__ . '/..' . '/psychomieze/parallel-phpunit-resultprinter/src',
-            ),
         ),
         'B' => 
         array (
