@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://cdn.rawgit.com/noerdisch/testing-framework/c60e5753/ext_icon.svg" height="100">
+    <img src="https://cdn.rawgit.com/markusguenther/abe70d34f4a4621aed0ef504c5d0192b/raw/77531b5fc35685c50e25f42a22e14ff89fbe438a/logo_large.svg" height="100">
 </p>
 
 [![Packagist](https://img.shields.io/packagist/l/noerdisch/testing-framework.svg?style=flat-square)](https://packagist.org/packages/noerdisch/testing-framework)
