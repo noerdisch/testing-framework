@@ -361,38 +361,43 @@ class Testbase
         $databaseCharset = trim(getenv('typo3DatabaseCharset'));
         if ($databaseName || $databaseHost || $databaseUsername || $databasePassword || $databasePort || $databaseSocket || $databaseCharset) {
             // Try to get database credentials from environment variables first
+
             $originalConfigurationArray = [
-                'DB' => [
-                    'Connections' => [
-                        'Default' => [
-                            'driver' => 'mysqli'
+                'EXTCONF' => [
+                    'dbal' => [
+                        'handlerCfg' => [
+                            '_DEFAULT' => [
+                                'driver' => 'mysqli'
+                            ],
+                            'type' => 'adodb',
                         ],
                     ],
                 ],
             ];
+
             if ($databaseName) {
-                $originalConfigurationArray['DB']['Connections']['Default']['dbname'] = $databaseName;
+                $originalConfigurationArray['DB']['database'] = $databaseName;
             }
             if ($databaseHost) {
-                $originalConfigurationArray['DB']['Connections']['Default']['host'] = $databaseHost;
+                $originalConfigurationArray['DB']['host'] = $databaseHost;
             }
             if ($databaseUsername) {
-                $originalConfigurationArray['DB']['Connections']['Default']['user'] = $databaseUsername;
+                $originalConfigurationArray['DB']['username'] = $databaseUsername;
             }
             if ($databasePassword !== false) {
-                $originalConfigurationArray['DB']['Connections']['Default']['password'] = $databasePasswordTrimmed;
+                $originalConfigurationArray['DB']['password'] = $databasePasswordTrimmed;
             }
             if ($databasePort) {
-                $originalConfigurationArray['DB']['Connections']['Default']['port'] = $databasePort;
+                $originalConfigurationArray['DB']['port'] = $databasePort;
             }
             if ($databaseSocket) {
-                $originalConfigurationArray['DB']['Connections']['Default']['unix_socket'] = $databaseSocket;
+                $this->exitWithMessage('The parameter "typo3DatabaseSocket" is not supported by TYPO3 7.6 LTS');
             }
             if ($databaseDriver) {
-                $originalConfigurationArray['DB']['Connections']['Default']['driver'] = $databaseDriver;
+                $originalConfigurationArray['EXTCONF']['dbal']['handlerCfg']['_DEFAULT']['driver'] = $databaseDriver;
             }
             if ($databaseCharset) {
-                $originalConfigurationArray['DB']['Connections']['Default']['charset'] = $databaseCharset;
+                $this->exitWithMessage('The parameter "typo3DatabaseCharset" is not supported by TYPO3 7.6 LTS');
             }
         } elseif (file_exists(ORIGINAL_ROOT . 'typo3conf/LocalConfiguration.php')) {
             // See if a LocalConfiguration file exists in "parent" instance to get db credentials from
@@ -418,8 +423,8 @@ class Testbase
     public function testDatabaseNameIsNotTooLong($originalDatabaseName, array $configuration)
     {
         // Maximum database name length for mysql is 64 characters
-        if (strlen($configuration['DB']['Connections']['Default']['dbname']) > 64) {
-            $suffixLength = strlen($configuration['DB']['Connections']['Default']['dbname']) - strlen($originalDatabaseName);
+        if (strlen($configuration['DB']['database']) > 64) {
+            $suffixLength = strlen($configuration['DB']['database']) - strlen($originalDatabaseName);
             $maximumOriginalDatabaseName = 64 - $suffixLength;
             throw new \Exception(
                 'The name of the database that is used for the functional test (' . $originalDatabaseName . ')' .
