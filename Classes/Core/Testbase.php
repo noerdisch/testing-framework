@@ -570,7 +570,8 @@ class Testbase
     protected function getVendorPath()
     {
         $webRoot = $this->getWebRoot();
-        $vendorPath = rtrim(realpath($webRoot), '\\/') . '/typo3_src/vendor';
+        $typo3Path = rtrim(realpath($webRoot), '\\/') . '/typo3';
+        $vendorPath = is_link($typo3Path) ? $this->getVendorPathFromSymlink(readlink($typo3Path)) : '';
 
         if (!is_dir($vendorPath)) {
             // None composer installations (e.g. via archive) has the vendor in the webroot folder
@@ -586,6 +587,33 @@ class Testbase
         }
 
         return $vendorPath . '/';
+    }
+
+    /**
+     * Extract the vendor path from the given sym link if vendor exists.
+     * TYPO3 often uses sym links to the sources so you can find out with the typo3 sym link for instance
+     * where the sources are located.
+     *
+     * @param string $symLink
+     * @return string
+     */
+    protected function getVendorPathFromSymlink($symLink)
+    {
+        $linkSegments = GeneralUtility::trimExplode('/', $symLink, TRUE);
+        if (!in_array('vendor', $linkSegments, true)) {
+            return '';
+        }
+
+        $vendorSegments = [];
+        foreach ($linkSegments as $segment) {
+            $vendorSegments[] = $segment;
+
+            if ($segment === 'vendor') {
+                break;
+            }
+        }
+
+        return realpath($this->getWebRoot() . implode('/', $vendorSegments));
     }
 
     /**
