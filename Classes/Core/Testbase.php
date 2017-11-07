@@ -186,7 +186,7 @@ class Testbase
      *
      * @param string $directory Absolute path to directories to create
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public function createDirectory($directory)
     {
@@ -196,7 +196,7 @@ class Testbase
         @mkdir($directory, 0777, true);
         clearstatcache();
         if (!is_dir($directory)) {
-            throw new Exception('Directory "' . $directory . '" could not be created', 1404038665);
+            throw new \Exception('Directory "' . $directory . '" could not be created', 1404038665);
         }
     }
 
@@ -223,14 +223,14 @@ class Testbase
      *
      * @param string $instancePath Absolute path to test instance
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public function removeOldInstanceIfExists($instancePath)
     {
         if (is_dir($instancePath)) {
             $success = GeneralUtility::rmdir($instancePath, true);
             if (!$success) {
-                throw new Exception(
+                throw new \Exception(
                     'Can not remove folder: ' . $instancePath,
                     1376657210
                 );
@@ -256,7 +256,7 @@ class Testbase
      * For functional and acceptance tests.
      *
      * @param string $instancePath Absolute path to test instance
-     * @throws Exception
+     * @throws \Exception
      * @return void
      */
     public function setUpInstanceCoreLinks($instancePath)
@@ -269,7 +269,7 @@ class Testbase
         foreach ($linksToSet as $from => $to) {
             $success = symlink($from, $to);
             if (!$success) {
-                throw new Exception(
+                throw new \Exception(
                     'Creating link failed: from ' . $from . ' to: ' . $to,
                     1376657199
                 );
@@ -283,7 +283,7 @@ class Testbase
      *
      * @param string $instancePath Absolute path to test instance
      * @param array $extensionPaths Contains paths to extensions relative to document root
-     * @throws Exception
+     * @throws \Exception
      * @return void
      */
     public function linkTestExtensionsToInstance($instancePath, array $extensionPaths)
@@ -291,7 +291,7 @@ class Testbase
         foreach ($extensionPaths as $extensionPath) {
             $absoluteExtensionPath = ORIGINAL_ROOT . $extensionPath;
             if (!is_dir($absoluteExtensionPath)) {
-                throw new Exception(
+                throw new \Exception(
                     'Test extension path ' . $absoluteExtensionPath . ' not found',
                     1376745645
                 );
@@ -299,7 +299,7 @@ class Testbase
             $destinationPath = $instancePath . '/typo3conf/ext/' . basename($absoluteExtensionPath);
             $success = symlink($absoluteExtensionPath, $destinationPath);
             if (!$success) {
-                throw new Exception(
+                throw new \Exception(
                     'Can not link extension folder: ' . $absoluteExtensionPath . ' to ' . $destinationPath,
                     1376657142
                 );
@@ -314,7 +314,7 @@ class Testbase
      *
      * @param string $instancePath Absolute path to test instance
      * @param array $pathsToLinkInTestInstance Contains paths as array of source => destination in key => value pairs of folders relative to test instance root
-     * @throws Exception if a source path could not be found and on failing creating the symlink
+     * @throws \Exception if a source path could not be found and on failing creating the symlink
      * @return void
      */
     public function linkPathsInTestInstance($instancePath, array $pathsToLinkInTestInstance)
@@ -322,7 +322,7 @@ class Testbase
         foreach ($pathsToLinkInTestInstance as $sourcePathToLinkInTestInstance => $destinationPathToLinkInTestInstance) {
             $sourcePath = $instancePath . '/' . ltrim($sourcePathToLinkInTestInstance, '/');
             if (!file_exists($sourcePath)) {
-                throw new Exception(
+                throw new \Exception(
                     'Path ' . $sourcePath . ' not found',
                     1476109221
                 );
@@ -330,7 +330,7 @@ class Testbase
             $destinationPath = $instancePath . '/' . ltrim($destinationPathToLinkInTestInstance, '/');
             $success = symlink($sourcePath, $destinationPath);
             if (!$success) {
-                throw new Exception(
+                throw new \Exception(
                     'Can not link the path ' . $sourcePath . ' to ' . $destinationPath,
                     1389969623
                 );
@@ -345,7 +345,7 @@ class Testbase
      *
      * An unique name will be added to the database name later.
      *
-     * @throws Exception
+     * @throws \Exception
      * @return array [DB][host], [DB][username], ...
      */
     public function getOriginalDatabaseSettingsFromEnvironmentOrLocalConfiguration()
@@ -398,7 +398,7 @@ class Testbase
             // See if a LocalConfiguration file exists in "parent" instance to get db credentials from
             $originalConfigurationArray = require ORIGINAL_ROOT . 'typo3conf/LocalConfiguration.php';
         } else {
-            throw new Exception(
+            throw new \Exception(
                 'Database credentials for tests are neither set through environment'
                 . ' variables, and can not be found in an existing LocalConfiguration file',
                 1397406356
@@ -413,7 +413,7 @@ class Testbase
      *
      * @param string $originalDatabaseName Base name of the database
      * @param array $configuration "LocalConfiguration" array with DB settings
-     * @throws Exception
+     * @throws \Exception
      */
     public function testDatabaseNameIsNotTooLong($originalDatabaseName, array $configuration)
     {
@@ -421,7 +421,7 @@ class Testbase
         if (strlen($configuration['DB']['Connections']['Default']['dbname']) > 64) {
             $suffixLength = strlen($configuration['DB']['Connections']['Default']['dbname']) - strlen($originalDatabaseName);
             $maximumOriginalDatabaseName = 64 - $suffixLength;
-            throw new Exception(
+            throw new \Exception(
                 'The name of the database that is used for the functional test (' . $originalDatabaseName . ')' .
                 ' exceeds the maximum length of 64 character allowed by MySQL. You have to shorten your' .
                 ' original database name to ' . $maximumOriginalDatabaseName . ' characters',
@@ -437,7 +437,7 @@ class Testbase
      * @param string $instancePath Absolute path to test instance
      * @param array $configuration Base configuration array
      * @param array $overruleConfiguration Overrule factory and base configuration
-     * @throws Exception
+     * @throws \Exception
      * @return void
      */
     public function setUpLocalConfiguration($instancePath, array $configuration, array $overruleConfiguration)
@@ -456,7 +456,7 @@ class Testbase
             ';'
         );
         if (!$result) {
-            throw new Exception('Can not write local configuration', 1376657277);
+            throw new \Exception('Can not write local configuration', 1376657277);
         }
     }
 
@@ -470,7 +470,7 @@ class Testbase
      * @param array $defaultCoreExtensionsToLoad Default list of core extensions to load
      * @param array $additionalCoreExtensionsToLoad Additional core extensions to load
      * @param array $testExtensionPaths Paths to extensions relative to document root
-     * @throws Exception
+     * @throws \Exception
      */
     public function setUpPackageStates(
         $instancePath,
@@ -517,7 +517,7 @@ class Testbase
         );
 
         if (!$result) {
-            throw new Exception('Can not write PackageStates', 1381612729);
+            throw new \Exception('Can not write PackageStates', 1381612729);
         }
     }
 
@@ -569,7 +569,7 @@ class Testbase
      * For composer installations the vendor folder is part of the typo3_src and in archive based installations it
      * is located in the web root of the TYPO3 instance. We need the vendor folder to get the classloader for instance.
      *
-     * @throws Exception
+     * @throws \Exception
      * @return string
      */
     protected function getVendorPath()
@@ -584,7 +584,7 @@ class Testbase
         }
 
         if (!is_dir($vendorPath)) {
-            throw new Exception(
+            throw new \Exception(
                 'Could not locate the TYPO3 autoload file. Please take care that the vendor folder is in the web root
                 folder or that us use typo3_src symlinks.',
                 1509639973
@@ -638,7 +638,7 @@ class Testbase
      * Truncate all tables.
      * For functional and acceptance tests.
      *
-     * @throws Exception
+     * @throws \Exception
      * @return void
      */
     public function initializeTestDatabaseAndTruncateTables()
