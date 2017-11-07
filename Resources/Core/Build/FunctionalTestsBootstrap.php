@@ -18,6 +18,7 @@
  * with phpunit parameter --bootstrap if executing single test case classes.
  */
 call_user_func(function () {
+    /** @var \Noerdisch\TestingFramework\Core\Testbase $testBase */
     $testBase = new \Noerdisch\TestingFramework\Core\Testbase();
     $testBase->initializeClassLoader();
     $testBase->enableDisplayErrors();

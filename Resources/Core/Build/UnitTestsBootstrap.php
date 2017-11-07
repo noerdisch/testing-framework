@@ -30,7 +30,7 @@
  */
 
 call_user_func(function () {
-    /** @var \Noerdisch\TestingFramework\Core\Testbase $testbase */
+    /** @var \Noerdisch\TestingFramework\Core\Testbase $testBase */
     $testBase = new Noerdisch\TestingFramework\Core\Testbase();
     $testBase->initializeClassLoader();
     $testBase->enableDisplayErrors();
