@@ -528,14 +528,19 @@ class Testbase
      * does not resolve the classes of the TYPO3 instance. So we initialize the class loader manually.
      *
      * @return void
+     * @throws \Exception
      */
     public function initializeClassLoader()
     {
         $autoloadFile = $this->getVendorPath() . 'autoload.php';
         if (!is_file($autoloadFile)) {
-            $classLoader = require $autoloadFile;
-            Bootstrap::getInstance()->initializeClassLoader($classLoader);
+            throw new \Exception(
+                'Not able to load the autoload configuration for the classloader. ', 1510058539
+            );
         }
+
+        $classLoader = require $autoloadFile;
+        Bootstrap::getInstance()->initializeClassLoader($classLoader);
     }
 
     /**
