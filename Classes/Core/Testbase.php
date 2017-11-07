@@ -85,6 +85,11 @@ class Testbase
      */
     public function defineBaseConstants()
     {
+        // This version, branch and copyright
+        define('TYPO3_version', '7.6.23');
+        define('TYPO3_branch', '7.6');
+        define('TYPO3_copyright_year', '1998-2017');
+
         // A null, a tabulator, a linefeed, a carriage return, a substitution, a CR-LF combination
         defined('NUL') ?: define('NUL', chr(0));
         defined('TAB') ?: define('TAB', chr(9));
