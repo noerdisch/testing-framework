@@ -599,12 +599,15 @@ class Testbase
      * TYPO3 often uses sym links to the sources so you can find out with the typo3 sym link for instance
      * where the sources are located.
      *
+     * We need to use none TYPO3 API methods at this point, because the also the bootstrap is using this method to
+     * get the correct classloading information. Without that the TYPO3 API is still undefined.
+     *
      * @param string $symLink
      * @return string
      */
     protected function getVendorPathFromSymlink($symLink)
     {
-        $linkSegments = GeneralUtility::trimExplode('/', $symLink, TRUE);
+        $linkSegments = explode('/', $symLink);
         if (!in_array('vendor', $linkSegments, true)) {
             return '';
         }
