@@ -23,6 +23,8 @@ namespace Noerdisch\TestingFramework\Service;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Install\Service\SqlExpectedSchemaService;
+use TYPO3\CMS\Install\Service\SqlSchemaMigrationService;
 
 /**
  * Service class for handling low level database connection
@@ -126,6 +128,74 @@ class DatabaseConnectionService implements SingletonInterface
                 1510147802
             );
         }
+    }
+
+    /**
+     * Create tables and import static rows
+     *
+     * @return \TYPO3\CMS\Install\Status\StatusInterface[]
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     * @throws \BadFunctionCallException
+     */
+    public function importDatabaseData()
+    {
+        $result = [];
+
+        // Import database data
+        if (!$this->databaseConnection) {
+            $this->initializeDatabaseConnection();
+        }
+
+        /** @var SqlSchemaMigrationService $schemaMigrationService */
+        $schemaMigrationService = GeneralUtility::makeInstance(SqlSchemaMigrationService::class);
+        /** @var SqlExpectedSchemaService $expectedSchemaService */
+        $expectedSchemaService = GeneralUtility::makeInstance(SqlExpectedSchemaService::class);
+
+        // Raw concatenated ext_tables.sql and friends string
+        $expectedSchemaString = $expectedSchemaService->getTablesDefinitionString(true);
+        $statements = $schemaMigrationService->getStatementArray($expectedSchemaString, true);
+        list($_, $insertCount) = $schemaMigrationService->getCreateTables($statements, true);
+        $fieldDefinitionsFile = $schemaMigrationService->getFieldDefinitions_fileContent($expectedSchemaString);
+        $fieldDefinitionsDatabase = $schemaMigrationService->getFieldDefinitions_database();
+        $difference = $schemaMigrationService->getDatabaseExtra($fieldDefinitionsFile, $fieldDefinitionsDatabase);
+        $updateStatements = $schemaMigrationService->getUpdateSuggestions($difference);
+
+        foreach (['add', 'change', 'create_table'] as $action) {
+            $updateStatus = $schemaMigrationService->performUpdateQueries($updateStatements[$action], $updateStatements[$action]);
+            if ($updateStatus !== true) {
+                foreach ($updateStatus as $statementIdentifier => $errorMessage) {
+                    $result[$updateStatements[$action][$statementIdentifier]] = $errorMessage;
+                }
+            }
+        }
+
+        if (empty($result)) {
+            foreach ($insertCount as $table => $count) {
+                $insertStatements = $schemaMigrationService->getTableInsertStatements($statements, $table);
+                foreach ($insertStatements as $insertQuery) {
+                    $insertQuery = rtrim($insertQuery, ';');
+                    $this->databaseConnection->admin_query($insertQuery);
+                    if ($this->databaseConnection->sql_error()) {
+                        $result[$insertQuery] = $this->databaseConnection->sql_error();
+                    }
+                }
+            }
+        }
+
+        foreach ($result as $statement => &$message) {
+            $errorStatus = $this->objectManager->get(ErrorStatus::class);
+            $errorStatus->setTitle('Database query failed!');
+            $errorStatus->setMessage(
+                'Query:' . LF .
+                ' ' . $statement . LF .
+                'Error:' . LF .
+                ' ' . $message
+            );
+            $message = $errorStatus;
+        }
+
+        return array_values($result);
     }
 
     /**

@@ -762,9 +762,41 @@ class Testbase
      */
     public function loadExtensionTables()
     {
-        Bootstrap::getInstance()
-            ->loadCachedTca()
-            ->loadExtensionTables();
+        $autoloadFile = $this->getVendorPath() . 'autoload.php';
+        if (!is_file($autoloadFile)) {
+            $classLoader = require $autoloadFile;
+            Bootstrap::getInstance()
+                ->initializeClassLoader($classLoader)
+                ->loadCachedTca()
+                ->loadExtensionTables();
+
+        }
+    }
+
+    /**
+     * Some actions like the database import need additional bootstrap actions performed.
+     *
+     * Those actions can potentially fatal if some old extension is loaded that triggers
+     * a fatal in ext_localconf or ext_tables code! Use only if really needed.
+     *
+     * @return void
+     * @throws \Exception
+     */
+    protected function loadExtLocalconfDatabaseAndExtTables()
+    {
+        $autoloadFile = $this->getVendorPath() . 'autoload.php';
+        if (!is_file($autoloadFile)) {
+            $classLoader = require $autoloadFile;
+            Bootstrap::getInstance()
+                ->initializeClassLoader($classLoader)
+                ->ensureClassLoadingInformationExists()
+                ->initializePackageManager()
+                ->loadTypo3LoadedExtAndExtLocalconf(false)
+                ->defineLoggingAndExceptionConstants()
+                ->unsetReservedGlobalVariables()
+                ->initializeTypo3DbGlobal()
+                ->loadExtensionTables(false);
+        }
     }
 
     /**
@@ -772,19 +804,15 @@ class Testbase
      * For functional and acceptance tests.
      *
      * @return void
+     * @throws \Exception
      */
     public function createDatabaseStructure()
     {
-        $schemaMigrationService = GeneralUtility::makeInstance(SchemaMigrator::class);
-        $sqlReader = GeneralUtility::makeInstance(SqlReader::class);
-        $sqlCode = $sqlReader->getTablesDefinitionString(true);
+        $this->loadExtLocalconfDatabaseAndExtTables();
 
-        $createTableStatements = $sqlReader->getCreateTableStatementArray($sqlCode);
-
-        $schemaMigrationService->install($createTableStatements);
-
-        $insertStatements = $sqlReader->getInsertStatementArray($sqlCode);
-        $schemaMigrationService->importStaticData($insertStatements);
+        /** @var DatabaseConnectionService $databaseConnectionService */
+        $databaseConnectionService = GeneralUtility::makeInstance(DatabaseConnectionService::class);
+        $databaseConnectionService->importDatabaseData();
     }
 
 
