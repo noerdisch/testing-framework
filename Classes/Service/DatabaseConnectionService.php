@@ -25,6 +25,7 @@ use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Service\SqlExpectedSchemaService;
 use TYPO3\CMS\Install\Service\SqlSchemaMigrationService;
+use TYPO3\CMS\Install\Status\ErrorStatus;
 
 /**
  * Service class for handling low level database connection
@@ -184,7 +185,7 @@ class DatabaseConnectionService implements SingletonInterface
         }
 
         foreach ($result as $statement => &$message) {
-            $errorStatus = $this->objectManager->get(ErrorStatus::class);
+            $errorStatus = GeneralUtility::makeInstance(ErrorStatus::class);
             $errorStatus->setTitle('Database query failed!');
             $errorStatus->setMessage(
                 'Query:' . LF .
