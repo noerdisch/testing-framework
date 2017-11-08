@@ -16,6 +16,7 @@ namespace Noerdisch\TestingFramework\Core;
  */
 
 use Codeception\Util\Autoload;
+use Noerdisch\TestingFramework\Service\DatabaseConnectionService;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
@@ -420,6 +421,16 @@ class Testbase
                 $originalConfigurationArray['DB']['port'] = $databasePort;
             }
             if ($databaseSocket) {
+                if (@file_exists($databaseSocket)) {
+                    $originalConfigurationArray['DB']['socket'] = $databaseSocket;
+                } else {
+                    $message = 'The parameter "typo3DatabaseSocket" is invalid. Given socket location does not exist';
+                    $message .= ' on server.';
+                    $this->exitWithMessage($message);
+                }
+            }
+            if ($databaseSocket) {
+                $originalConfigurationArray['DB']['socket'] = $databasePort;
                 $this->exitWithMessage('The parameter "typo3DatabaseSocket" is not supported by TYPO3 7.6 LTS');
             }
             if ($databaseDriver) {
@@ -438,6 +449,7 @@ class Testbase
                 1397406356
             );
         }
+
         return $originalConfigurationArray['DB'];
     }
 
@@ -490,7 +502,40 @@ class Testbase
             ';'
         );
         if (!$result) {
-            throw new \Exception('Can not write local configuration', 1376657277);
+            throw new \RuntimeException('Can not write local configuration', 1376657277);
+        }
+    }
+
+    /**
+     * Create a low level connection to dbms, without selecting the target database.
+     * Drop existing database if it exists and create a new one.
+     *
+     * @param string $databaseName Database name of this test instance
+     * @param string $originalDatabaseName Original database name before suffix was added
+     * @throws \TYPO3\TestingFramework\Core\Exception
+     * @return void
+     */
+    public function setUpTestDatabase($databaseName, $originalDatabaseName)
+    {
+        /** @var DatabaseConnectionService $databaseConnectionService */
+        $databaseConnectionService = GeneralUtility::makeInstance(DatabaseConnectionService::class);
+
+        if (in_array($databaseName, $databaseConnectionService->listDatabases(), true)) {
+            $databaseConnectionService->dropDatabase($databaseName);
+        }
+
+        try {
+            $databaseConnectionService->createDatabase($databaseName);
+        } catch (\Exception $e) {
+            $user = $GLOBALS['TYPO3_CONF_VARS']['DB']['username'];
+            $host = $GLOBALS['TYPO3_CONF_VARS']['DB']['host'];
+            throw new \Exception(
+                'Unable to create database with name ' . $databaseName . '. This is probably a permission problem.'
+                . ' For this instance this could be fixed executing:'
+                . ' GRANT ALL ON `' . $originalDatabaseName . '_%`.* TO `' . $user . '`@`' . $host . '`;'
+                . ' Original message thrown by database layer: ' . $e->getMessage(),
+                1376579070
+            );
         }
     }
 
@@ -585,7 +630,7 @@ class Testbase
     public function initializeDefaultConfiguration()
     {
         $configurationManager = new ConfigurationManager();
-        $GLOBALS['TYPO3_CONF_VARS'] = $configurationManager->getDefaultConfiguration();
+        $GLOBALS['TYPO3_CONF_VARS'] = $configurationManager->getLocalConfiguration();
 
         // avoid failing tests that rely on HTTP_HOST retrieval
         $GLOBALS['TYPO3_CONF_VARS']['trustedHostsPattern'] = '.*';
