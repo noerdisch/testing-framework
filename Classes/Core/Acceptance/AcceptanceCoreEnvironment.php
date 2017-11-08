@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+
 namespace Noerdisch\TestingFramework\Core\Acceptance;
 
 /*
@@ -159,45 +159,47 @@ class AcceptanceCoreEnvironment extends Extension
      */
     public function bootstrapTypo3Environment(SuiteEvent $suiteEvent)
     {
-        $testbase = new Testbase();
-        $testbase->enableDisplayErrors();
-        $testbase->initializeCodeceptionAutoloader();
-        $testbase->defineBaseConstants();
-        $testbase->defineSitePath();
-        $testbase->initializeGlobalVariables();
-        $testbase->defineOriginalRootPath();
-        $testbase->createDirectory(ORIGINAL_ROOT . 'typo3temp/var/tests/acceptance');
-        $testbase->createDirectory(ORIGINAL_ROOT . 'typo3temp/var/transient');
+        /** @var Testbase $testBase */
+        $testBase = new Testbase();
+        $testBase->initializeClassLoader();
+        $testBase->initializeCodeceptionAutoloader();
+        $testBase->enableDisplayErrors();
+        $testBase->defineBaseConstants();
+        $testBase->defineSitePath();
+        $testBase->initializeGlobalVariables();
+        $testBase->defineOriginalRootPath();
+        $testBase->createDirectory(ORIGINAL_ROOT . 'typo3temp/var/tests/acceptance');
+        $testBase->createDirectory(ORIGINAL_ROOT . 'typo3temp/var/transient');
 
         $instancePath = ORIGINAL_ROOT . 'typo3temp/var/tests/acceptance';
 
-        $testbase->defineTypo3ModeBe();
-        $testbase->setTypo3TestingContext();
-        $testbase->removeOldInstanceIfExists($instancePath);
+        $testBase->defineTypo3ModeBe();
+        $testBase->setTypo3TestingContext();
+        $testBase->removeOldInstanceIfExists($instancePath);
         // Basic instance directory structure
-        $testbase->createDirectory($instancePath . '/fileadmin');
-        $testbase->createDirectory($instancePath . '/typo3temp/var/transient');
-        $testbase->createDirectory($instancePath . '/typo3temp/assets');
-        $testbase->createDirectory($instancePath . '/typo3conf/ext');
-        $testbase->createDirectory($instancePath . '/uploads');
+        $testBase->createDirectory($instancePath . '/fileadmin');
+        $testBase->createDirectory($instancePath . '/typo3temp/var/transient');
+        $testBase->createDirectory($instancePath . '/typo3temp/assets');
+        $testBase->createDirectory($instancePath . '/typo3conf/ext');
+        $testBase->createDirectory($instancePath . '/uploads');
         // Additionally requested directories
         foreach ($this->additionalFoldersToCreate as $directory) {
-            $testbase->createDirectory($instancePath . '/' . $directory);
+            $testBase->createDirectory($instancePath . '/' . $directory);
         }
-        $testbase->createLastRunTextfile($instancePath);
-        $testbase->setUpInstanceCoreLinks($instancePath);
+        $testBase->createLastRunTextfile($instancePath);
+        $testBase->setUpInstanceCoreLinks($instancePath);
         // ext:styleguide is always loaded
         $testExtensionsToLoad = array_merge(
             [ 'typo3conf/ext/styleguide' ],
             $this->testExtensionsToLoad
         );
-        $testbase->linkTestExtensionsToInstance($instancePath, $testExtensionsToLoad);
-        $testbase->linkPathsInTestInstance($instancePath, $this->pathsToLinkInTestInstance);
-        //$localConfiguration['DB'] = $testbase->getOriginalDatabaseSettingsFromEnvironmentOrLocalConfiguration();
-        //$originalDatabaseName = $localConfiguration['DB']['Connections']['Default']['dbname'];
+        $testBase->linkTestExtensionsToInstance($instancePath, $testExtensionsToLoad);
+        $testBase->linkPathsInTestInstance($instancePath, $this->pathsToLinkInTestInstance);
+        $localConfiguration['DB'] = $testBase->getOriginalDatabaseSettingsFromEnvironmentOrLocalConfiguration();
+        $originalDatabaseName = $localConfiguration['DB']['database'];
         // Append the unique identifier to the base database name to end up with a single database per test case
-        //$localConfiguration['DB']['Connections']['Default']['dbname'] = $originalDatabaseName . '_at';
-        //$testbase->testDatabaseNameIsNotTooLong($originalDatabaseName, $localConfiguration);
+        $localConfiguration['DB']['database'] = $originalDatabaseName . '_at';
+        $testBase->testDatabaseNameIsNotTooLong($originalDatabaseName, $localConfiguration);
         // Set some hard coded base settings for the instance. Those could be overruled by
         // $this->configurationToUseInTestInstance if needed again.
         $localConfiguration['BE']['debug'] = true;
@@ -211,9 +213,9 @@ class AcceptanceCoreEnvironment extends Extension
         $localConfiguration['SYS']['trustedHostsPattern'] = 'localhost:8000';
         $localConfiguration['SYS']['encryptionKey'] = 'iAmInvalid';
         // @todo: This sql_mode should be enabled as soon as styleguide and dataHandler can cope with it
-        //$localConfiguration['SYS']['setDBinit'] = 'SET SESSION sql_mode = \'STRICT_ALL_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_VALUE_ON_ZERO,NO_ENGINE_SUBSTITUTION,NO_ZERO_DATE,NO_ZERO_IN_DATE,ONLY_FULL_GROUP_BY\';';
+        $localConfiguration['SYS']['setDBinit'] = 'SET SESSION sql_mode = \'STRICT_ALL_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_VALUE_ON_ZERO,NO_ENGINE_SUBSTITUTION,NO_ZERO_DATE,NO_ZERO_IN_DATE,ONLY_FULL_GROUP_BY\';';
         $localConfiguration['SYS']['caching']['cacheConfigurations']['extbase_object']['backend'] = NullBackend::class;
-        $testbase->setUpLocalConfiguration($instancePath, $localConfiguration, $this->configurationToUseInTestInstance);
+        $testBase->setUpLocalConfiguration($instancePath, $localConfiguration, $this->configurationToUseInTestInstance);
         $defaultCoreExtensionsToLoad = [
             'core',
             'beuser',
@@ -237,11 +239,12 @@ class AcceptanceCoreEnvironment extends Extension
             'scheduler',
             'tstemplate',
         ];
-        $testbase->setUpPackageStates($instancePath, $defaultCoreExtensionsToLoad, $this->coreExtensionsToLoad, $testExtensionsToLoad);
-        $testbase->setUpBasicTypo3Bootstrap($instancePath);
-        //$testbase->setUpTestDatabase($localConfiguration['DB']['Connections']['Default']['dbname'], $originalDatabaseName);
-        $testbase->loadExtensionTables();
-        //$testbase->createDatabaseStructure();
+        $testBase->setUpPackageStates($instancePath, $defaultCoreExtensionsToLoad, $this->coreExtensionsToLoad, $testExtensionsToLoad);
+        $testBase->setUpBasicTypo3Bootstrap($instancePath);
+        $testBase->initializeDefaultConfiguration();
+        $testBase->setUpTestDatabase($localConfiguration['DB']['database'], $originalDatabaseName);
+        $testBase->loadExtensionTables();
+        $testBase->createDatabaseStructure();
 
         // Unset a closure or phpunit kicks in with a 'serialization of \Closure is not allowed'
         // Alternative solution:
@@ -250,22 +253,22 @@ class AcceptanceCoreEnvironment extends Extension
         $suite->setBackupGlobals(false);
 
         foreach ($this->xmlDatabaseFixtures as $fixture) {
-            //$testbase->importXmlDatabaseFixture($fixture);
+            //$testBase->importXmlDatabaseFixture($fixture);
         }
 
         // styleguide generator uses DataHandler for some parts. DataHandler needs an initialized BE user
         // with admin right and the live workspace.
-        Bootstrap::getInstance()->initializeBackendUser();
+        //Bootstrap::getInstance()->initializeBackendUser();
         $GLOBALS['BE_USER']->user['admin'] = 1;
         $GLOBALS['BE_USER']->user['uid'] = 1;
         $GLOBALS['BE_USER']->workspace = 0;
-        Bootstrap::getInstance()->initializeLanguageObject();
+        //Bootstrap::getInstance()->initializeLanguageObject();
 
-        $styleguideGenerator = new Generator();
-        $styleguideGenerator->create();
+        //$styleguideGenerator = new Generator();
+        //$styleguideGenerator->create();
 
         // @todo: Find out why that is needed to execute the first test successfully
-        $this->cleanupTypo3Environment();
+        //$this->cleanupTypo3Environment();
     }
 
     /**
@@ -277,9 +280,9 @@ class AcceptanceCoreEnvironment extends Extension
     {
         // Reset uc db field of be_user "admin" to null to reduce
         // possible side effects between single tests.
-        GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getConnectionForTable('be_users')
-            ->update('be_users', ['uc' => null], ['uid' => 1]);
+        //GeneralUtility::makeInstance(ConnectionPool::class)
+          //  ->getConnectionForTable('be_users')
+          //  ->update('be_users', ['uc' => null], ['uid' => 1]);
     }
 
     /**
@@ -289,7 +292,7 @@ class AcceptanceCoreEnvironment extends Extension
      *
      * @return string
      */
-    protected function getInstallToolPassword(): string
+    protected function getInstallToolPassword()
     {
         $password = getenv('typo3InstallToolPassword');
         if (!empty($password)) {
