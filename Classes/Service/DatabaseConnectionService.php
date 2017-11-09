@@ -90,7 +90,8 @@ class DatabaseConnectionService implements SingletonInterface
      * @throws \BadFunctionCallException
      * @throws \RuntimeException
      */
-    public function dropDatabase($databaseName) {
+    public function dropDatabase($databaseName)
+    {
         if (!$this->databaseConnection) {
             $this->initializeDatabaseConnection();
         }
@@ -115,7 +116,8 @@ class DatabaseConnectionService implements SingletonInterface
      * @throws \BadFunctionCallException
      * @throws \RuntimeException
      */
-    public function createDatabase($databaseName) {
+    public function createDatabase($databaseName)
+    {
         if (!$this->databaseConnection) {
             $this->initializeDatabaseConnection();
         }
@@ -134,18 +136,22 @@ class DatabaseConnectionService implements SingletonInterface
     /**
      * Create tables and import static rows
      *
+     * @param string $databaseName
      * @return \TYPO3\CMS\Install\Status\StatusInterface[]
+     * @throws \Exception
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      * @throws \BadFunctionCallException
      */
-    public function importDatabaseData()
+    public function importDatabaseData($databaseName)
     {
-        $result = [];
-
         // Import database data
         if (!$this->databaseConnection) {
             $this->initializeDatabaseConnection();
+        }
+
+        if ($databaseName !== '') {
+            $this->databaseConnection->setDatabaseName($databaseName);
         }
 
         /** @var SqlSchemaMigrationService $schemaMigrationService */
@@ -156,47 +162,72 @@ class DatabaseConnectionService implements SingletonInterface
         // Raw concatenated ext_tables.sql and friends string
         $expectedSchemaString = $expectedSchemaService->getTablesDefinitionString(true);
         $statements = $schemaMigrationService->getStatementArray($expectedSchemaString, true);
-        list($_, $insertCount) = $schemaMigrationService->getCreateTables($statements, true);
-        $fieldDefinitionsFile = $schemaMigrationService->getFieldDefinitions_fileContent($expectedSchemaString);
-        $fieldDefinitionsDatabase = $schemaMigrationService->getFieldDefinitions_database();
-        $difference = $schemaMigrationService->getDatabaseExtra($fieldDefinitionsFile, $fieldDefinitionsDatabase);
-        $updateStatements = $schemaMigrationService->getUpdateSuggestions($difference);
+        list($createTableStatements, $insertCount) = $schemaMigrationService->getCreateTables($statements, true);
 
-        foreach (['add', 'change', 'create_table'] as $action) {
-            $updateStatus = $schemaMigrationService->performUpdateQueries($updateStatements[$action], $updateStatements[$action]);
-            if ($updateStatus !== true) {
-                foreach ($updateStatus as $statementIdentifier => $errorMessage) {
-                    $result[$updateStatements[$action][$statementIdentifier]] = $errorMessage;
-                }
+        // Execute SQL queries and merging potential errors
+        $createSqlErrors = $this->executeStatements($createTableStatements);
+        $insertSqlErrors = $this->handleInsertStatements($insertCount, $statements);
+        $sqlErrors = array_merge($createSqlErrors, $insertSqlErrors);
+
+        return array_values($sqlErrors);
+    }
+
+    /**
+     * Gets all SQL statements as array and an array with the amount of existing insert statements.
+     * The inserts are a list of tables that has insert statements. So we iterate over the inserts and extract the
+     * insert statements of the existing SQL.
+     *
+     * @param array $inserts
+     * @param array $statements
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    protected function handleInsertStatements(array $inserts, array $statements) {
+        if (!is_array($inserts)) {
+            return [];
+        }
+
+        /** @var SqlSchemaMigrationService $schemaMigrationService */
+        $schemaMigrationService = GeneralUtility::makeInstance(SqlSchemaMigrationService::class);
+
+        $sqlErrors = [];
+        foreach ($inserts as $table => $count) {
+            $insertStatements = $schemaMigrationService->getTableInsertStatements($statements, $table);
+            $insertStatementsError = $this->executeStatements($insertStatements);
+
+            if (count($insertStatementsError)) {
+                $sqlErrors = array_merge($sqlErrors, $insertStatementsError);
             }
         }
 
-        if (empty($result)) {
-            foreach ($insertCount as $table => $count) {
-                $insertStatements = $schemaMigrationService->getTableInsertStatements($statements, $table);
-                foreach ($insertStatements as $insertQuery) {
-                    $insertQuery = rtrim($insertQuery, ';');
-                    $this->databaseConnection->admin_query($insertQuery);
-                    if ($this->databaseConnection->sql_error()) {
-                        $result[$insertQuery] = $this->databaseConnection->sql_error();
-                    }
-                }
+        return $sqlErrors;
+    }
+
+    /**
+     * Gets SQL statements as array and uses the TYPO3_DB to write the statements.
+     * Is used for creating the tables and insert some test data.
+     *
+     * The uses database connection is really low level. We use the admin_query method of the TYPO3
+     * DatabaseConnection at this point.
+     *
+     * @param array $statements
+     * @return array
+     */
+    protected function executeStatements(array $statements) {
+        if (!is_array($statements)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($statements as $statement) {
+            $createQuery = rtrim($statement, ';');
+            $this->databaseConnection->admin_query($createQuery);
+            if ($this->databaseConnection->sql_error()) {
+                $result[$createQuery] = $this->databaseConnection->sql_error();
             }
         }
 
-        foreach ($result as $statement => &$message) {
-            $errorStatus = GeneralUtility::makeInstance(ErrorStatus::class);
-            $errorStatus->setTitle('Database query failed!');
-            $errorStatus->setMessage(
-                'Query:' . LF .
-                ' ' . $statement . LF .
-                'Error:' . LF .
-                ' ' . $message
-            );
-            $message = $errorStatus;
-        }
-
-        return array_values($result);
+        return $result;
     }
 
     /**

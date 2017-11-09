@@ -629,15 +629,13 @@ class Testbase
         $_SERVER['PWD'] = $instancePath;
         $_SERVER['argv'][0] = 'index.php';
         $classLoader = require rtrim(realpath($instancePath . '/typo3'), '\\/') . '/../vendor/autoload.php';
-        Bootstrap::getInstance()
-            ->initializeClassLoader($classLoader)
-            ->baseSetup()
+        $this->bootstrap = Bootstrap::getInstance()->initializeClassLoader($classLoader);
+        $this->bootstrap->baseSetup()
             ->loadConfigurationAndInitialize(true);
         $this->dumpClassLoadingInformation();
-        Bootstrap::getInstance()->loadTypo3LoadedExtAndExtLocalconf(true)
+        $this->bootstrap->loadTypo3LoadedExtAndExtLocalconf(true)
             ->setFinalCachingFrameworkCacheConfiguration()
             ->unsetReservedGlobalVariables();
-
     }
 
     /**
@@ -744,7 +742,7 @@ class Testbase
             $this->initializeClassLoader();
         }
 
-        //$this->bootstrap->loadExtensionTables(FALSE);
+        $this->bootstrap->loadExtensionTables(FALSE);
     }
 
     /**
@@ -767,6 +765,10 @@ class Testbase
             $GLOBALS['TYPO3_CONF_VARS']['FE']['ContentObjects'] = [];
         }
 
+        if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['trustedHostsPattern'])) {
+            $GLOBALS['TYPO3_CONF_VARS']['SYS']['trustedHostsPattern'] = '.*';
+        }
+
         $this->bootstrap
             ->ensureClassLoadingInformationExists()
             ->loadTypo3LoadedExtAndExtLocalconf(false)
@@ -780,16 +782,17 @@ class Testbase
      * Create tables and import static rows.
      * For functional and acceptance tests.
      *
+     * @param string $databaseName
      * @return void
      * @throws \Exception
      */
-    public function createDatabaseStructure()
+    public function createDatabaseStructure($databaseName)
     {
         $this->loadExtLocalconfDatabaseAndExtTables();
 
         /** @var DatabaseConnectionService $databaseConnectionService */
         $databaseConnectionService = GeneralUtility::makeInstance(DatabaseConnectionService::class);
-        //$databaseConnectionService->importDatabaseData();
+        $databaseConnectionService->importDatabaseData($databaseName);
     }
 
 

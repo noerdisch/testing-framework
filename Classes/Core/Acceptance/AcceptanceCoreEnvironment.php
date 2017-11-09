@@ -244,7 +244,7 @@ class AcceptanceCoreEnvironment extends Extension
         $testBase->initializeDefaultConfiguration();
         $testBase->setUpTestDatabase($localConfiguration['DB']['database'], $originalDatabaseName);
         $testBase->loadExtensionTables();
-        $testBase->createDatabaseStructure();
+        $testBase->createDatabaseStructure($localConfiguration['DB']['database']);
 
         // Unset a closure or phpunit kicks in with a 'serialization of \Closure is not allowed'
         // Alternative solution:
