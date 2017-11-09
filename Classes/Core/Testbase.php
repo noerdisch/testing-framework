@@ -654,6 +654,20 @@ class Testbase
     }
 
     /**
+     * The styleguide generator uses DataHandler for some parts. DataHandler needs an initialized BE user
+     * with admin right and the live workspace.
+     *
+     * @return void
+     */
+    public function initializeBackendUser() {
+        $this->bootstrap->initializeBackendUser();
+        $GLOBALS['BE_USER']->user['admin'] = 1;
+        $GLOBALS['BE_USER']->user['uid'] = 1;
+        $GLOBALS['BE_USER']->workspace = 0;
+        $this->bootstrap->initializeLanguageObject();
+    }
+
+    /**
      * For composer installations the vendor folder is part of the typo3_src and in archive based installations it
      * is located in the web root of the TYPO3 instance. We need the vendor folder to get the classloader for instance.
      *

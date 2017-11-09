@@ -19,9 +19,7 @@ use Codeception\Event\SuiteEvent;
 use Codeception\Events;
 use Codeception\Extension;
 use TYPO3\CMS\Core\Cache\Backend\NullBackend;
-use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Styleguide\TcaDataGenerator\Generator;
 use Noerdisch\TestingFramework\Core\Testbase;
 
@@ -257,16 +255,10 @@ class AcceptanceCoreEnvironment extends Extension
             $testBase->importXmlDatabaseFixture($fixture);
         }
 
-        // styleguide generator uses DataHandler for some parts. DataHandler needs an initialized BE user
-        // with admin right and the live workspace.
-        //Bootstrap::getInstance()->initializeBackendUser();
-        $GLOBALS['BE_USER']->user['admin'] = 1;
-        $GLOBALS['BE_USER']->user['uid'] = 1;
-        $GLOBALS['BE_USER']->workspace = 0;
-        //Bootstrap::getInstance()->initializeLanguageObject();
-
-        //$styleguideGenerator = new Generator();
-        //$styleguideGenerator->create();
+        $testBase->initializeBackendUser();
+        /** @var Generator $styleguideGenerator */
+        $styleguideGenerator = new Generator();
+        $styleguideGenerator->create();
 
         // @todo: Find out why that is needed to execute the first test successfully
         //$this->cleanupTypo3Environment();
