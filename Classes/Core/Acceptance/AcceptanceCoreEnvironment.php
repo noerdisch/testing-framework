@@ -133,12 +133,12 @@ class AcceptanceCoreEnvironment extends Extension
      * @var array
      */
     protected $xmlDatabaseFixtures = [
-        'PACKAGE:typo3/testing-framework/Resources/Core/Acceptance/Fixtures/be_users.xml',
-        'PACKAGE:typo3/testing-framework/Resources/Core/Acceptance/Fixtures/be_sessions.xml',
-        'PACKAGE:typo3/testing-framework/Resources/Core/Acceptance/Fixtures/be_groups.xml',
-        'PACKAGE:typo3/testing-framework/Resources/Core/Acceptance/Fixtures/sys_category.xml',
-        'PACKAGE:typo3/testing-framework/Resources/Core/Acceptance/Fixtures/tx_extensionmanager_domain_model_extension.xml',
-        'PACKAGE:typo3/testing-framework/Resources/Core/Acceptance/Fixtures/tx_extensionmanager_domain_model_repository.xml',
+        'EXT:noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/be_users.xml',
+        'EXT:noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/be_sessions.xml',
+        'EXT:noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/be_groups.xml',
+        'EXT:noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/sys_category.xml',
+        'EXT:noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/tx_extensionmanager_domain_model_extension.xml',
+        'EXT:noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/tx_extensionmanager_domain_model_repository.xml',
     ];
 
     /**
@@ -199,6 +199,7 @@ class AcceptanceCoreEnvironment extends Extension
         $originalDatabaseName = $localConfiguration['DB']['database'];
         // Append the unique identifier to the base database name to end up with a single database per test case
         $localConfiguration['DB']['database'] = $originalDatabaseName . '_at';
+        $testBase->setDatabaseName($localConfiguration['DB']['database']);
         $testBase->testDatabaseNameIsNotTooLong($originalDatabaseName, $localConfiguration);
         // Set some hard coded base settings for the instance. Those could be overruled by
         // $this->configurationToUseInTestInstance if needed again.
@@ -244,7 +245,7 @@ class AcceptanceCoreEnvironment extends Extension
         $testBase->initializeDefaultConfiguration();
         $testBase->setUpTestDatabase($localConfiguration['DB']['database'], $originalDatabaseName);
         $testBase->loadExtensionTables();
-        $testBase->createDatabaseStructure($localConfiguration['DB']['database']);
+        $testBase->createDatabaseStructure();
 
         // Unset a closure or phpunit kicks in with a 'serialization of \Closure is not allowed'
         // Alternative solution:
@@ -253,7 +254,7 @@ class AcceptanceCoreEnvironment extends Extension
         $suite->setBackupGlobals(false);
 
         foreach ($this->xmlDatabaseFixtures as $fixture) {
-            //$testBase->importXmlDatabaseFixture($fixture);
+            $testBase->importXmlDatabaseFixture($fixture);
         }
 
         // styleguide generator uses DataHandler for some parts. DataHandler needs an initialized BE user

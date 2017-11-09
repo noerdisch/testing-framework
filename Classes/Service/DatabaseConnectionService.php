@@ -173,6 +173,45 @@ class DatabaseConnectionService implements SingletonInterface
     }
 
     /**
+     * Updates the given table with record information of the fixtures.
+     *
+     *
+     * @param string $databaseName
+     * @param string $tableName
+     * @param array $fixtureData
+     * @return void
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     * @throws \BadFunctionCallException
+     */
+    public function insertFixtureData($databaseName, $tableName, array $fixtureData)
+    {
+        if (!$this->databaseConnection) {
+            $this->initializeDatabaseConnection();
+        }
+
+        if ($databaseName !== '') {
+            $this->databaseConnection->setDatabaseName($databaseName);
+        }
+
+        if (!is_array($fixtureData) || trim($tableName) === '') {
+            throw new \InvalidArgumentException(
+                'Given table name "' . $tableName . '" or fixture data is invalid',
+                1510234767
+            );
+        }
+
+        $result = $this->databaseConnection->exec_INSERTquery($tableName, $fixtureData);
+        if ($result === FALSE) {
+            throw new \RuntimeException(
+                'MySQL Error: Cannot insert fixture data to table ' . $tableName . ' : "' .
+                $this->databaseConnection->sql_error() . '"!',
+                1510234634
+            );
+        }
+    }
+
+    /**
      * Gets all SQL statements as array and an array with the amount of existing insert statements.
      * The inserts are a list of tables that has insert statements. So we iterate over the inserts and extract the
      * insert statements of the existing SQL.
@@ -182,7 +221,8 @@ class DatabaseConnectionService implements SingletonInterface
      * @return array
      * @throws \InvalidArgumentException
      */
-    protected function handleInsertStatements(array $inserts, array $statements) {
+    protected function handleInsertStatements(array $inserts, array $statements)
+    {
         if (!is_array($inserts)) {
             return [];
         }
@@ -213,7 +253,8 @@ class DatabaseConnectionService implements SingletonInterface
      * @param array $statements
      * @return array
      */
-    protected function executeStatements(array $statements) {
+    protected function executeStatements(array $statements)
+    {
         if (!is_array($statements)) {
             return [];
         }

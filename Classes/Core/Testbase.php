@@ -42,6 +42,11 @@ class Testbase
     protected $bootstrap = NULL;
 
     /**
+     * @var string
+     */
+    protected $databaseName = '';
+
+    /**
      * This class must be called in CLI environment as a security measure
      * against path disclosures and other stuff. Check this within
      * constructor to make sure this check can't be circumvented.
@@ -52,6 +57,16 @@ class Testbase
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             die('This script supports command line usage only. Please check your command.');
         }
+    }
+
+    /**
+     * Setter for database name.
+     *
+     * @param $databaseName
+     * @return void
+     */
+    public function setDatabaseName($databaseName) {
+        $this->databaseName = $databaseName;
     }
 
     /**
@@ -782,17 +797,69 @@ class Testbase
      * Create tables and import static rows.
      * For functional and acceptance tests.
      *
-     * @param string $databaseName
      * @return void
      * @throws \Exception
      */
-    public function createDatabaseStructure($databaseName)
+    public function createDatabaseStructure()
     {
         $this->loadExtLocalconfDatabaseAndExtTables();
 
         /** @var DatabaseConnectionService $databaseConnectionService */
         $databaseConnectionService = GeneralUtility::makeInstance(DatabaseConnectionService::class);
-        $databaseConnectionService->importDatabaseData($databaseName);
+        $databaseConnectionService->importDatabaseData($this->databaseName);
+    }
+
+    /**
+     * Imports a data set represented as XML into the test database,
+     *
+     * @todo Add reference handling like https://github.com/TYPO3/testing-framework/ do
+     * @param string $path Absolute path to the XML file containing the data set to load
+     * @return void
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     */
+    public function importXmlDatabaseFixture($path)
+    {
+        $path = $this->resolvePath($path);
+        if (!is_file($path)) {
+            throw new \RuntimeException(
+                'Fixture file ' . $path . ' not found',
+                1376746261
+            );
+        }
+
+        /** @var DatabaseConnectionService $databaseConnectionService */
+        $databaseConnectionService = GeneralUtility::makeInstance(DatabaseConnectionService::class);
+        $fileContent = file_get_contents($path);
+
+        // Disables the functionality to allow external entities to be loaded when parsing the XML, must be kept
+        $previousValueOfEntityLoader = libxml_disable_entity_loader(true);
+        $xml = simplexml_load_string($fileContent);
+        libxml_disable_entity_loader($previousValueOfEntityLoader);
+
+        $foreignKeys = [];
+        /** @var $table \SimpleXMLElement */
+        foreach ($xml->children() as $table) {
+            $insertArray = [];
+            /** @var $column \SimpleXMLElement */
+            foreach ($table->children() as $column) {
+                $columnName = $column->getName();
+                $columnValue = null;
+                if (isset($column['ref'])) {
+                    list($tableName, $elementId) = explode('#', $column['ref']);
+                    $columnValue = $foreignKeys[$tableName][$elementId];
+                } elseif (isset($column['is-NULL']) && ($column['is-NULL'] === 'yes')) {
+                    $columnValue = null;
+                } else {
+                    $columnValue = (string)$table->$columnName;
+                }
+                $insertArray[$columnName] = $columnValue;
+            }
+
+            // Insert the row
+            $tableName = $table->getName();
+            $databaseConnectionService->insertFixtureData($this->databaseName, $tableName, $insertArray);
+        }
     }
 
 
