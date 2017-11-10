@@ -17,7 +17,7 @@ namespace TYPO3\CMS\Core\Tests\Acceptance\Backend\Formhandler;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverKeys;
-use TYPO3\TestingFramework\Core\Acceptance\Step\Backend\Admin;
+use Noerdisch\TestingFramework\Core\Acceptance\Step\Backend\Admin;
 
 /**
  * Abstract class for "elements_basic" tests of styleguide

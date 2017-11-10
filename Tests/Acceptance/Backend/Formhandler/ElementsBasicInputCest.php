@@ -14,8 +14,8 @@ namespace TYPO3\CMS\Core\Tests\Acceptance\Backend\Formhandler;
  * The TYPO3 project - inspiring people to share!
  */
 
-use TYPO3\TestingFramework\Core\Acceptance\Step\Backend\Admin;
-use TYPO3\TestingFramework\Core\Acceptance\Support\Page\PageTree;
+use Noerdisch\TestingFramework\Core\Acceptance\Step\Backend\Admin;
+use Noerdisch\TestingFramework\Core\Acceptance\Support\Page\PageTree;
 
 /**
  * Tests for "elements_basic" simple input fields of ext:styleguide

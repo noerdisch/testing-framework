@@ -14,7 +14,7 @@ namespace TYPO3\CMS\Core\Tests\Acceptance\Backend\Language;
  * The TYPO3 project - inspiring people to share!
  */
 
-use TYPO3\TestingFramework\Core\Acceptance\Step\Backend\Admin;
+use Noerdisch\TestingFramework\Core\Acceptance\Step\Backend\Admin;
 
 /**
  * Language tests
