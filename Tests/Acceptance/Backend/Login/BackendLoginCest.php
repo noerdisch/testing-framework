@@ -137,7 +137,7 @@ class BackendLoginCest
         $I->click('#t3-login-submit-section > button');
         // wait for the next to element to indicate if the backend was loaded successful
         $I->waitForElement('.nav', 30);
-        $I->waitForElement('.scaffold-content iframe', 30);
+        $I->waitForElement('#typo3-contentContainer iframe', 30);
         $I->seeCookie('be_lastLoginProvider');
         $I->seeCookie('be_typo_user');
     }
