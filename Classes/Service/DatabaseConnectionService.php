@@ -212,6 +212,46 @@ class DatabaseConnectionService implements SingletonInterface
     }
 
     /**
+     * Updates the given table with record information.
+     *
+     *
+     * @param string $databaseName
+     * @param string $tableName
+     * @param array $fieldData
+     * @param string $whereClause
+     * @return void
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     * @throws \BadFunctionCallException
+     */
+    public function update($databaseName, $tableName, array $fieldData, $whereClause)
+    {
+        if (!$this->databaseConnection) {
+            $this->initializeDatabaseConnection();
+        }
+
+        if ($databaseName !== '') {
+            $this->databaseConnection->setDatabaseName($databaseName);
+        }
+
+        if (!is_array($fieldData) || trim($tableName) === '' || trim($whereClause) === '') {
+            throw new \InvalidArgumentException(
+                'Given table name "' . $tableName . '", whereClause or field data is invalid',
+                1510320043
+            );
+        }
+
+        $result = $this->databaseConnection->exec_UPDATEquery($tableName, $whereClause, $fieldData);
+        if ($result === FALSE) {
+            throw new \RuntimeException(
+                'MySQL Error: Cannot update data to table ' . $tableName . ' : "' .
+                $this->databaseConnection->sql_error() . '"!',
+                1510320049
+            );
+        }
+    }
+
+    /**
      * Gets all SQL statements as array and an array with the amount of existing insert statements.
      * The inserts are a list of tables that has insert statements. So we iterate over the inserts and extract the
      * insert statements of the existing SQL.

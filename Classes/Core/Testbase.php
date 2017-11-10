@@ -65,7 +65,8 @@ class Testbase
      * @param $databaseName
      * @return void
      */
-    public function setDatabaseName($databaseName) {
+    public function setDatabaseName($databaseName)
+    {
         $this->databaseName = $databaseName;
     }
 
@@ -659,7 +660,8 @@ class Testbase
      *
      * @return void
      */
-    public function initializeBackendUser() {
+    public function initializeBackendUser()
+    {
         $this->bootstrap->initializeBackendUser();
         $GLOBALS['BE_USER']->user['admin'] = 1;
         $GLOBALS['BE_USER']->user['uid'] = 1;
@@ -954,5 +956,21 @@ class Testbase
             return true;
         }
         return false;
+    }
+
+    /**
+     * Reset uc db field of be_user "admin" to null to reduce possible side effects between single tests.
+     *
+     * @return void
+     */
+    public function cleanupTypo3Environment()
+    {
+        /** @var DatabaseConnectionService $databaseConnectionService */
+        $databaseConnectionService = GeneralUtility::makeInstance(DatabaseConnectionService::class);
+        try {
+            $databaseConnectionService->update($this->databaseName, 'be_users', ['uc' => null], 'uid = 1');
+        } catch (\Exception $exception) {
+            $this->exitWithMessage('Could not cleanup the TYPO3 instance for some reasons');
+        }
     }
 }
