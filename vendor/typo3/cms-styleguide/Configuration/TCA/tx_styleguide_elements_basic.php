@@ -467,6 +467,21 @@ return [
                 ],
             ],
         ],
+        'input_38' => [
+            'exclude' => 1,
+            'label' => 'input_38 inputLink allowedExtensions=png',
+            'config' => [
+                'type' => 'input',
+                'renderType' => 'inputLink',
+                'fieldControl' => [
+                    'linkPopup' => [
+                        'options' => [
+                            'allowedExtensions' => 'png',
+                        ]
+                    ]
+                ],
+            ],
+        ],
 
 
         'inputdatetime_1' => [
@@ -1095,6 +1110,14 @@ return [
                 'type' => 'passthrough',
             ],
         ],
+        'passthrough_2' => [
+            'exclude' => 1,
+            'label' => 'passthrough_2 not shown, default applied',
+            'config' => [
+                'type' => 'passthrough',
+                'default' => 42,
+            ],
+        ],
 
 
         'user_1' => [
@@ -1194,6 +1217,81 @@ return [
                                     </ROOT>
                                 </sInput>
 
+                                <sInputDateTime>
+                                    <ROOT>
+                                        <type>array</type>
+                                        <TCEforms>
+                                            <sheetTitle>inputDateTime</sheetTitle>
+                                        </TCEforms>
+                                        <el>
+                                            <inputDateTime_1>
+                                                <TCEforms>
+                                                    <label>inputDateTime_1 eval=date</label>
+                                                    <config>
+                                                        <type>input</type>
+                                                        <renderType>inputDateTime</renderType>
+                                                        <eval>date</eval>
+                                                    </config>
+                                                </TCEforms>
+                                            </inputDateTime_1>
+                                            <inputDateTime_2>
+                                                <TCEforms>
+                                                    <label>inputDateTime_2 dbType=date eval=date</label>
+                                                    <config>
+                                                        <type>input</type>
+                                                        <renderType>inputDateTime</renderType>
+                                                        <eval>date</eval>
+                                                        <dbType>date</dbType>
+                                                        <default>0000-00-00</default>
+                                                    </config>
+                                                </TCEforms>
+                                            </inputDateTime_2>
+                                            <inputDateTime_3>
+                                                <TCEforms>
+                                                    <label>inputDateTime_3 eval=datetime</label>
+                                                    <config>
+                                                        <type>input</type>
+                                                        <renderType>inputDateTime</renderType>
+                                                        <eval>datetime</eval>
+                                                    </config>
+                                                </TCEforms>
+                                            </inputDateTime_3>
+                                            <inputDateTime_4>
+                                                <TCEforms>
+                                                    <label>inputDateTime_4 dbType=datetime eval=datetime</label>
+                                                    <config>
+                                                        <type>input</type>
+                                                        <renderType>inputDateTime</renderType>
+                                                        <eval>date</eval>
+                                                        <dbType>datetime</dbType>
+                                                        <default>0000-00-00 00:00:00</default>
+                                                    </config>
+                                                </TCEforms>
+                                            </inputDateTime_4>
+                                            <inputDateTime_5>
+                                                <TCEforms>
+                                                    <label>inputDateTime_5 eval=time</label>
+                                                    <config>
+                                                        <type>input</type>
+                                                        <renderType>inputDateTime</renderType>
+                                                        <eval>time</eval>
+                                                    </config>
+                                                </TCEforms>
+                                            </inputDateTime_5>
+                                            <inputDateTime_6>
+                                                <TCEforms>
+                                                    <label>inputDateTime_6 eval=timesec</label>
+                                                    <config>
+                                                        <type>input</type>
+                                                        <renderType>inputDateTime</renderType>
+                                                        <eval>timesec</eval>
+                                                    </config>
+                                                </TCEforms>
+                                            </inputDateTime_6>
+                                        </el>
+                                    </ROOT>
+                                </sInputDateTime>
+
                                 <sText>
                                     <ROOT>
                                         <type>array</type>
@@ -1291,7 +1389,7 @@ return [
                 --div--;input,
                     input_1, input_2, input_3, input_4, input_5, input_8, input_9, input_10,
                     input_11, input_12, input_13, input_15, input_16, input_19, input_20,
-                    input_21, input_22, input_23, input_24, input_25, input_26, input_27, input_14, input_28, input_29, input_30,
+                    input_21, input_22, input_23, input_24, input_25, input_26, input_27, input_14, input_28, input_29, input_38, input_30,
                     input_31, input_32, input_33, input_35, input_36, input_34, input_37,
                 --div--;inputDateTime,
                     inputdatetime_1, inputdatetime_2, inputdatetime_3, inputdatetime_4, inputdatetime_5,
@@ -1307,7 +1405,7 @@ return [
                 --div--;none,
                     none_1, none_2, none_3, none_4, none_5,
                 --div--;passthrough,
-                    passthrough_1,
+                    passthrough_1, passthrough_2,
                 --div--;user,
                     user_1, user_2,
                 --div--;in flex,

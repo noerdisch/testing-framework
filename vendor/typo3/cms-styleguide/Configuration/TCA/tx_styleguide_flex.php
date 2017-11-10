@@ -143,6 +143,32 @@ return [
                                             </config>
                                         </TCEforms>
                                     </input_1>
+                                    <input_2>
+                                        <TCEforms>
+                                            <label>input_2, default value</label>
+                                            <config>
+                                                <type>input</type>
+                                                <default>foo</default>
+                                            </config>
+                                        </TCEforms>
+                                    </input_2>
+                                    <passthrough_1>
+                                        <TCEforms>
+                                            <label>passthrough_1</label>
+                                            <config>
+                                                <type>passthrough</type>
+                                            </config>
+                                        </TCEforms>
+                                    </passthrough_1>
+                                    <passthrough_2>
+                                        <TCEforms>
+                                            <label>passthrough_2 with default value</label>
+                                            <config>
+                                                <type>passthrough</type>
+                                                <default>passthrough default</default>
+                                            </config>
+                                        </TCEforms>
+                                    </passthrough_2>
                                 </el>
                             </ROOT>
                         </T3DataStructure>

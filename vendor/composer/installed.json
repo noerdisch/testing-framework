@@ -1536,57 +1536,6 @@
         ]
     },
     {
-        "name": "typo3/cms-styleguide",
-        "version": "8.0.12",
-        "version_normalized": "8.0.12.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/TYPO3/styleguide.git",
-            "reference": "0a1ab0e425f5033f1c7329975565996c7c2da6f8"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/TYPO3/styleguide/zipball/0a1ab0e425f5033f1c7329975565996c7c2da6f8",
-            "reference": "0a1ab0e425f5033f1c7329975565996c7c2da6f8",
-            "shasum": ""
-        },
-        "replace": {
-            "styleguide": "*"
-        },
-        "time": "2017-06-02T15:58:51+00:00",
-        "type": "typo3-cms-extension",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "TYPO3\\CMS\\Styleguide\\": "Classes/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "GPL-2.0+"
-        ],
-        "authors": [
-            {
-                "name": "Felix Kopp",
-                "email": "felix-source@phorax.com",
-                "homepage": "http://phorax.com",
-                "role": "Developer"
-            },
-            {
-                "name": "TYPO3 CMS Core Team",
-                "homepage": "https://forge.typo3.org/projects/typo3cms-core",
-                "role": "Developer"
-            }
-        ],
-        "description": "TYPO3 CMS Extension to test everything in the TYPO3 Backend",
-        "homepage": "https://github.com/TYPO3/styleguide",
-        "keywords": [
-            "style guide",
-            "typo3",
-            "typo3 backend"
-        ]
-    },
-    {
         "name": "se/selenium-server-standalone",
         "version": "3.6.0",
         "version_normalized": "3.6.0.0",
@@ -2410,6 +2359,57 @@
         "keywords": [
             "constructor",
             "instantiate"
+        ]
+    },
+    {
+        "name": "typo3/cms-styleguide",
+        "version": "8.0.13",
+        "version_normalized": "8.0.13.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/TYPO3/styleguide.git",
+            "reference": "fd49466bad8aa9ce395d14443ce81cff711cb305"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/TYPO3/styleguide/zipball/fd49466bad8aa9ce395d14443ce81cff711cb305",
+            "reference": "fd49466bad8aa9ce395d14443ce81cff711cb305",
+            "shasum": ""
+        },
+        "replace": {
+            "styleguide": "*"
+        },
+        "time": "2017-11-08T12:44:36+00:00",
+        "type": "typo3-cms-extension",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "TYPO3\\CMS\\Styleguide\\": "Classes/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "GPL-2.0+"
+        ],
+        "authors": [
+            {
+                "name": "Felix Kopp",
+                "email": "felix-source@phorax.com",
+                "homepage": "http://phorax.com",
+                "role": "Developer"
+            },
+            {
+                "name": "TYPO3 CMS Core Team",
+                "homepage": "https://forge.typo3.org/projects/typo3cms-core",
+                "role": "Developer"
+            }
+        ],
+        "description": "TYPO3 CMS Extension to test everything in the TYPO3 Backend",
+        "homepage": "https://github.com/TYPO3/styleguide",
+        "keywords": [
+            "style guide",
+            "typo3",
+            "typo3 backend"
         ]
     }
 ]

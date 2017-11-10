@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "18442caf8613d559dd594660eb3540fc",
+    "content-hash": "edae59b8f2211c9d0fd517b3ef4402fc",
     "packages": [
         {
             "name": "behat/gherkin",
@@ -2197,16 +2197,16 @@
         },
         {
             "name": "typo3/cms-styleguide",
-            "version": "8.0.12",
+            "version": "8.0.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TYPO3/styleguide.git",
-                "reference": "0a1ab0e425f5033f1c7329975565996c7c2da6f8"
+                "reference": "fd49466bad8aa9ce395d14443ce81cff711cb305"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TYPO3/styleguide/zipball/0a1ab0e425f5033f1c7329975565996c7c2da6f8",
-                "reference": "0a1ab0e425f5033f1c7329975565996c7c2da6f8",
+                "url": "https://api.github.com/repos/TYPO3/styleguide/zipball/fd49466bad8aa9ce395d14443ce81cff711cb305",
+                "reference": "fd49466bad8aa9ce395d14443ce81cff711cb305",
                 "shasum": ""
             },
             "replace": {
@@ -2242,7 +2242,7 @@
                 "typo3",
                 "typo3 backend"
             ],
-            "time": "2017-06-02T15:58:51+00:00"
+            "time": "2017-11-08T12:44:36+00:00"
         },
         {
             "name": "typo3fluid/fluid",

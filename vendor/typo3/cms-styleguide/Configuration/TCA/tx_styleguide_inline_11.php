@@ -1,7 +1,7 @@
 <?php
 return [
     'ctrl' => [
-        'title' => 'Form engine - inline use combination',
+        'title' => 'Form engine - inline 1:1 with relation filed on parent side',
         'label' => 'uid',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
@@ -63,31 +63,38 @@ return [
             'l10n_display' => 'defaultAsReadonly'
         ],
         'sys_language_uid' => [
-            'exclude' => 1,
+            'exclude' => true,
             'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.language',
             'config' => [
                 'type' => 'select',
                 'renderType' => 'selectSingle',
-                'foreign_table' => 'sys_language',
-                'foreign_table_where' => 'ORDER BY sys_language.title',
+                'special' => 'languages',
                 'items' => [
-                    ['LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.allLanguages', -1],
-                    ['LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.default_value', 0]
-                ]
+                    [
+                        'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.allLanguages',
+                        -1,
+                        'flags-multiple'
+                    ],
+                ],
+                'default' => 0,
             ]
         ],
         'l10n_parent' => [
+            'exclude' => true,
             'displayCond' => 'FIELD:sys_language_uid:>:0',
-            'exclude' => 1,
             'label' => 'Translation parent',
             'config' => [
                 'type' => 'select',
                 'renderType' => 'selectSingle',
                 'items' => [
-                    ['', 0],
+                    [
+                        '',
+                        0
+                    ]
                 ],
-                'foreign_table' => 'tx_styleguide_inline_usecombination',
-                'foreign_table_where' => 'AND tx_styleguide_inline_usecombination.pid=###CURRENT_PID### AND tx_styleguide_inline_usecombination.sys_language_uid IN (-1,0)',
+                'foreign_table' => 'tx_styleguide_inline_11',
+                'foreign_table_where' => 'AND tx_styleguide_inline_11.pid=###CURRENT_PID### AND tx_styleguide_inline_11.sys_language_uid IN (-1,0)',
+                'default' => 0
             ]
         ],
         'l10n_source' => [
@@ -103,14 +110,15 @@ return [
                         0
                     ]
                 ],
-                'foreign_table' => 'tx_styleguide_inline_usecombination',
-                'foreign_table_where' => 'AND tx_styleguide_inline_usecombination.pid=###CURRENT_PID### AND tx_styleguide_inline_usecombination.uid!=###THIS_UID###',
+                'foreign_table' => 'tx_styleguide_inline_11',
+                'foreign_table_where' => 'AND tx_styleguide_inline_11.pid=###CURRENT_PID### AND tx_styleguide_inline_11.uid!=###THIS_UID###',
                 'default' => 0
             ]
         ],
         'l10n_diffsource' => [
             'config' => [
-                'type' => 'passthrough'
+                'type' => 'passthrough',
+                'default' => ''
             ]
         ],
 
@@ -119,30 +127,26 @@ return [
             'label' => 'inline_1',
             'config' => [
                 'type' => 'inline',
-                'foreign_table' => 'tx_styleguide_inline_usecombination_mm',
-                'foreign_field' => 'select_parent',
-                'foreign_selector' => 'select_child',
-                'foreign_unique' => 'select_child',
-                'maxitems' => 9999,
+                'foreign_table' => 'tx_styleguide_inline_11_child',
                 'appearance' => [
-                    'newRecordLinkAddTitle' => 1,
-                    'useCombination' => true,
-                    'collapseAll' => false,
-                    'levelLinksPosition' => 'top',
-                    'showSynchronizationLink' => 1,
-                    'showPossibleLocalizationRecords' => 1,
-                    'showAllLocalizationLink' => 1,
+                    'showSynchronizationLink' => true,
+                    'showAllLocalizationLink' => true,
+                    'showPossibleLocalizationRecords' => true,
                 ],
+                'maxitems' => 1,
             ],
         ],
-
-
     ],
 
 
     'types' => [
         '0' => [
-            'showitem' => 'inline_1',
+            'showitem' => '
+                inline_1,
+                --div--;meta,
+                    disable, starttime, endtime, sys_language_uid, l10n_parent, l10n_source,
+
+            ',
         ],
     ],
 
