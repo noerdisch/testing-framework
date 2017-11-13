@@ -24,7 +24,6 @@ class ComposerStaticInita1ada698de71d4ac9544083ef1fce489
         ),
         'T' => 
         array (
-            'TYPO3\\CMS\\Styleguide\\' => 21,
             'TYPO3Fluid\\Fluid\\' => 17,
         ),
         'S' => 
@@ -81,10 +80,6 @@ class ComposerStaticInita1ada698de71d4ac9544083ef1fce489
         'Webmozart\\Assert\\' => 
         array (
             0 => __DIR__ . '/..' . '/webmozart/assert/src',
-        ),
-        'TYPO3\\CMS\\Styleguide\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/typo3/cms-styleguide/Classes',
         ),
         'TYPO3Fluid\\Fluid\\' => 
         array (
