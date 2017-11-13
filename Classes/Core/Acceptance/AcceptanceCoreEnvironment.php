@@ -290,8 +290,8 @@ class AcceptanceCoreEnvironment extends Extension
 
         $testBase->initializeBackendUser();
         /** @var Generator $styleguideGenerator */
-        //$styleguideGenerator = new Generator();
-        //$styleguideGenerator->create();
+        $styleguideGenerator = new Generator();
+        $styleguideGenerator->create();
 
         // @todo: Find out why that is needed to execute the first test successfully
         $testBase->cleanupTypo3Environment();
