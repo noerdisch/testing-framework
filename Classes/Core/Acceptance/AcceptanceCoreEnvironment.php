@@ -208,11 +208,43 @@ class AcceptanceCoreEnvironment extends Extension
         $localConfiguration['SYS']['isInitialDatabaseImportDone'] = true;
         $localConfiguration['SYS']['displayErrors'] = false;
         $localConfiguration['SYS']['debugExceptionHandler'] = '';
-        $localConfiguration['SYS']['trustedHostsPattern'] = 'localhost:8000';
+        $localConfiguration['SYS']['trustedHostsPattern'] = '.*';
         $localConfiguration['SYS']['encryptionKey'] = 'iAmInvalid';
+        $localConfiguration['SYS']['lang']['format']['priority'] = 'xlf,xml';
+        $localConfiguration['SYS']['lang']['parser']['xlf'] = \TYPO3\CMS\Core\Localization\Parser\XliffParser::class;
+        $localConfiguration['SYS']['lang']['parser']['xml'] = \TYPO3\CMS\Core\Localization\Parser\LocallangXmlParser::class;
         // @todo: This sql_mode should be enabled as soon as styleguide and dataHandler can cope with it
         $localConfiguration['SYS']['setDBinit'] = 'SET SESSION sql_mode = \'STRICT_ALL_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_VALUE_ON_ZERO,NO_ENGINE_SUBSTITUTION,NO_ZERO_DATE,NO_ZERO_IN_DATE,ONLY_FULL_GROUP_BY\';';
         $localConfiguration['SYS']['caching']['cacheConfigurations']['extbase_object']['backend'] = NullBackend::class;
+        $localConfiguration['SYS']['fal'] = [
+            'registeredDrivers' => [
+                'Local' => [
+                    'class' => \TYPO3\CMS\Core\Resource\Driver\LocalDriver::class,
+                    'shortName' => 'Local',
+                    'flexFormDS' => 'FILE:EXT:core/Configuration/Resource/Driver/LocalDriverFlexForm.xml',
+                    'label' => 'Local filesystem'
+                ]
+            ],
+            'defaultFilterCallbacks' => [
+                [
+                    \TYPO3\CMS\Core\Resource\Filter\FileNameFilter::class,
+                    'filterHiddenFilesAndFolders'
+                ]
+            ],
+            'processingTaskTypes' => [
+                'Image.Preview' => \TYPO3\CMS\Core\Resource\Processing\ImagePreviewTask::class,
+                'Image.CropScaleMask' => \TYPO3\CMS\Core\Resource\Processing\ImageCropScaleMaskTask::class
+            ],
+            'registeredCollections' => [
+                'static' => \TYPO3\CMS\Core\Resource\Collection\StaticFileCollection::class,
+                'folder' => \TYPO3\CMS\Core\Resource\Collection\FolderBasedFileCollection::class,
+                'category' => \TYPO3\CMS\Core\Resource\Collection\CategoryBasedFileCollection::class,
+            ],
+            'onlineMediaHelpers' => [
+                'youtube' => \TYPO3\CMS\Core\Resource\OnlineMedia\Helpers\YouTubeHelper::class,
+                'vimeo' => \TYPO3\CMS\Core\Resource\OnlineMedia\Helpers\VimeoHelper::class,
+            ],
+        ];
         $testBase->setUpLocalConfiguration($instancePath, $localConfiguration, $this->configurationToUseInTestInstance);
         $defaultCoreExtensionsToLoad = [
             'core',
