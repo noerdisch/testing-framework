@@ -130,12 +130,12 @@ class AcceptanceCoreEnvironment extends Extension
      * @var array
      */
     protected $xmlDatabaseFixtures = [
-        'EXT:noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/be_users.xml',
-        'EXT:noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/be_sessions.xml',
-        'EXT:noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/be_groups.xml',
-        'EXT:noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/sys_category.xml',
-        'EXT:noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/tx_extensionmanager_domain_model_extension.xml',
-        'EXT:noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/tx_extensionmanager_domain_model_repository.xml',
+        'typo3conf/ext/noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/be_users.xml',
+        'typo3conf/ext/noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/be_sessions.xml',
+        'typo3conf/ext/noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/be_groups.xml',
+        'typo3conf/ext/noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/sys_category.xml',
+        'typo3conf/ext/noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/tx_extensionmanager_domain_model_extension.xml',
+        'typo3conf/ext/noerdisch-testing-framework/Resources/Core/Acceptance/Fixtures/tx_extensionmanager_domain_model_repository.xml',
     ];
 
     /**
@@ -162,13 +162,13 @@ class AcceptanceCoreEnvironment extends Extension
         $testBase->initializeCodeceptionAutoloader();
         $testBase->enableDisplayErrors();
         $testBase->defineBaseConstants();
-        $testBase->defineSitePath();
         $testBase->initializeGlobalVariables();
         $testBase->defineOriginalRootPath();
         $testBase->createDirectory(ORIGINAL_ROOT . 'typo3temp/var/tests/acceptance');
         $testBase->createDirectory(ORIGINAL_ROOT . 'typo3temp/var/transient');
 
-        $instancePath = ORIGINAL_ROOT . 'typo3temp/var/tests/acceptance';
+        $instancePath = ORIGINAL_ROOT . 'typo3temp/var/tests/acceptance/';
+        $testBase->defineSitePath($instancePath);
 
         $testBase->defineTypo3ModeBe();
         $testBase->setTypo3TestingContext();

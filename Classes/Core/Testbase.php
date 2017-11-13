@@ -146,9 +146,10 @@ class Testbase
      *
      * @return void
      */
-    public function defineSitePath()
+    public function defineSitePath($instancePath = '')
     {
-        defined('PATH_site') ?: define('PATH_site', $this->getWebRoot());
+        $instanceWebRoot = is_dir($instancePath) ? $instancePath : $this->getWebRoot();
+        defined('PATH_site') ?: define('PATH_site', $instanceWebRoot);
         defined('PATH_thisScript') ?: define('PATH_thisScript', PATH_site . 'typo3/cli_dispatch.phpsh');
         $_SERVER['SCRIPT_NAME'] = PATH_thisScript;
 
@@ -175,7 +176,7 @@ class Testbase
             define('ORIGINAL_ROOT', $this->getWebRoot());
         }
 
-        if (!file_exists(ORIGINAL_ROOT . 'typo3/cli_dispatch.phpsh')) {
+        if (file_exists(ORIGINAL_ROOT . 'typo3/cli_dispatch.phpsh') === FALSE) {
             $this->exitWithMessage('Unable to determine path to entry script. Please check your path or set an environment variable \'TYPO3_PATH_ROOT\' to your root path.');
         }
     }
@@ -315,7 +316,7 @@ class Testbase
                     1376745645
                 );
             }
-            $destinationPath = $instancePath . '/typo3conf/ext/' . basename($absoluteExtensionPath);
+            $destinationPath = $instancePath . 'typo3conf/ext/' . basename($absoluteExtensionPath);
             $success = symlink($absoluteExtensionPath, $destinationPath);
             if (!$success) {
                 throw new \Exception(
@@ -556,14 +557,16 @@ class Testbase
         // Register default list of extensions and set active
         foreach ($defaultCoreExtensionsToLoad as $extensionName) {
             $packageStates['packages'][$extensionName] = [
-                'packagePath' => 'typo3/sysext/' . $extensionName . '/'
+                'packagePath' => 'typo3/sysext/' . $extensionName . '/',
+                'state' => 'active',
             ];
         }
 
         // Register additional core extensions and set active
         foreach ($additionalCoreExtensionsToLoad as $extensionName) {
             $packageStates['packages'][$extensionName] = [
-                'packagePath' => 'typo3/sysext/' . $extensionName . '/'
+                'packagePath' => 'typo3/sysext/' . $extensionName . '/',
+                'state' => 'active',
             ];
         }
 
@@ -571,7 +574,8 @@ class Testbase
         foreach ($testExtensionPaths as $extensionPath) {
             $extensionName = basename($extensionPath);
             $packageStates['packages'][$extensionName] = [
-                'packagePath' => 'typo3conf/ext/' . $extensionName . '/'
+                'packagePath' => 'typo3conf/ext/' . $extensionName . '/',
+                'state' => 'active',
             ];
         }
 
@@ -646,8 +650,8 @@ class Testbase
         $_SERVER['argv'][0] = 'index.php';
         $classLoader = require rtrim(realpath($instancePath . '/typo3'), '\\/') . '/../vendor/autoload.php';
         $this->bootstrap = Bootstrap::getInstance()->initializeClassLoader($classLoader);
-        $this->bootstrap->baseSetup()
-            ->loadConfigurationAndInitialize(true);
+        $this->bootstrap->baseSetup();
+        $this->bootstrap->loadConfigurationAndInitialize(true);
         $this->dumpClassLoadingInformation();
         $this->bootstrap->loadTypo3LoadedExtAndExtLocalconf(true)
             ->setFinalCachingFrameworkCacheConfiguration()
