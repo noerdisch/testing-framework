@@ -177,6 +177,8 @@ class AcceptanceCoreEnvironment extends Extension
         $testBase->createDirectory($instancePath . '/fileadmin');
         $testBase->createDirectory($instancePath . '/typo3temp/var/transient');
         $testBase->createDirectory($instancePath . '/typo3temp/assets');
+        $testBase->createDirectory($instancePath . '/typo3temp/Cache');
+        $testBase->createDirectory($instancePath . '/typo3temp/Cache/Data');
         $testBase->createDirectory($instancePath . '/typo3conf/ext');
         $testBase->createDirectory($instancePath . '/uploads');
         // Additionally requested directories
