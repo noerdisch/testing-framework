@@ -156,20 +156,66 @@ class DatabaseConnectionService implements SingletonInterface
 
         /** @var SqlSchemaMigrationService $schemaMigrationService */
         $schemaMigrationService = GeneralUtility::makeInstance(SqlSchemaMigrationService::class);
-        /** @var SqlExpectedSchemaService $expectedSchemaService */
-        $expectedSchemaService = GeneralUtility::makeInstance(SqlExpectedSchemaService::class);
 
         // Raw concatenated ext_tables.sql and friends string
-        $expectedSchemaString = $expectedSchemaService->getTablesDefinitionString(true);
+        $expectedSchemaString = $this->getTablesDefinitionString(true);
         $statements = $schemaMigrationService->getStatementArray($expectedSchemaString, true);
-        list($createTableStatements, $insertCount) = $schemaMigrationService->getCreateTables($statements, true);
+        list($_, $insertCount) = $schemaMigrationService->getCreateTables($statements, true);
+        $fieldDefinitionsFile = $schemaMigrationService->getFieldDefinitions_fileContent($expectedSchemaString);
+        $fieldDefinitionsDatabase = $schemaMigrationService->getFieldDefinitions_database();
+        $difference = $schemaMigrationService->getDatabaseExtra($fieldDefinitionsFile, $fieldDefinitionsDatabase);
+        $updateStatements = $schemaMigrationService->getUpdateSuggestions($difference);
 
-        // Execute SQL queries and merging potential errors
-        $createSqlErrors = $this->executeStatements($createTableStatements);
-        $insertSqlErrors = $this->handleInsertStatements($insertCount, $statements);
-        $sqlErrors = array_merge($createSqlErrors, $insertSqlErrors);
+        foreach (['add', 'change', 'create_table'] as $action) {
+            $updateStatus = $schemaMigrationService->performUpdateQueries($updateStatements[$action], $updateStatements[$action]);
+            if ($updateStatus !== true) {
+                foreach ($updateStatus as $statementIdentifier => $errorMessage) {
+                    $result[$updateStatements[$action][$statementIdentifier]] = $errorMessage;
+                }
+            }
+        }
 
-        return array_values($sqlErrors);
+        if (empty($result)) {
+            foreach ($insertCount as $table => $count) {
+                $insertStatements = $schemaMigrationService->getTableInsertStatements($statements, $table);
+                foreach ($insertStatements as $insertQuery) {
+                    $insertQuery = rtrim($insertQuery, ';');
+                    $this->databaseConnection->admin_query($insertQuery);
+                    if ($this->databaseConnection->sql_error()) {
+                        $result[$insertQuery] = $this->databaseConnection->sql_error();
+                    }
+                }
+            }
+        }
+
+        return array_values($result);
+    }
+
+    /**
+     * Cycle through all loaded extensions and get full table definitions as concatenated string
+     *
+     * @param bool $withStatic TRUE if sql from ext_tables_static+adt.sql should be loaded, too.
+     * @return string Concatenated SQL of loaded extensions ext_tables.sql
+     */
+    public function getTablesDefinitionString($withStatic = false)
+    {
+        $sqlString = [];
+
+        // Find all ext_tables.sql of loaded extensions
+        $loadedExtensionInformation = $GLOBALS['TYPO3_LOADED_EXT'];
+        foreach ($loadedExtensionInformation as $extensionConfiguration) {
+            if ((is_array($extensionConfiguration) || $extensionConfiguration instanceof \ArrayAccess) && $extensionConfiguration['ext_tables.sql']) {
+                $sqlString[] = GeneralUtility::getUrl($extensionConfiguration['ext_tables.sql']);
+            }
+            if ($withStatic
+                && (is_array($extensionConfiguration) || $extensionConfiguration instanceof \ArrayAccess)
+                && $extensionConfiguration['ext_tables_static+adt.sql']
+            ) {
+                $sqlString[] = GeneralUtility::getUrl($extensionConfiguration['ext_tables_static+adt.sql']);
+            }
+        }
+
+        return implode(LF . LF . LF . LF, $sqlString);
     }
 
     /**
