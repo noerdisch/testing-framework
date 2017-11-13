@@ -306,8 +306,8 @@ class AcceptanceCoreEnvironment extends Extension
     {
         /** @var Testbase $testBase */
         $testBase = new Testbase();
-        $localConfiguration['DB'] = $testBase->getOriginalDatabaseSettingsFromEnvironmentOrLocalConfiguration();
-        $testBase->setDatabaseName($localConfiguration['DB']['database'] . '_at');
+        //$localConfiguration['DB'] = $testBase->getOriginalDatabaseSettingsFromEnvironmentOrLocalConfiguration();
+        //$testBase->setDatabaseName($localConfiguration['DB']['database'] . '_at');
         $testBase->cleanupTypo3Environment();
     }
 

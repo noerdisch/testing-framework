@@ -972,7 +972,12 @@ class Testbase
         /** @var DatabaseConnectionService $databaseConnectionService */
         $databaseConnectionService = GeneralUtility::makeInstance(DatabaseConnectionService::class);
         try {
-            $databaseConnectionService->update($this->databaseName, 'be_users', ['uc' => null], 'uid = 1');
+            $databaseConnectionService->update(
+                !empty($this->databaseName) ? $this->databaseName : $GLOBALS['TYPO3_CONF_VARS']['DB']['database'],
+            'be_users',
+            ['uc' => null],
+            'uid = 1'
+        );
         } catch (\Exception $exception) {
             $this->exitWithMessage('Could not cleanup the TYPO3 instance for some reasons');
         }
