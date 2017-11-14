@@ -26,7 +26,7 @@ class LogoCest
      */
     public function _before(Admin $I)
     {
-        $I->login('admin', 'password');
+        $I->login();
         // Ensure main content frame is fully loaded, otherwise there are load-race-conditions
         $I->switchToIFrame('content');
         $I->waitForText('New TYPO3 site');
