@@ -1,4 +1,5 @@
 <?php
+
 namespace TYPO3\CMS\Core\Tests\Acceptance\Backend\Extensionmanager;
 
 /*
@@ -14,6 +15,7 @@ namespace TYPO3\CMS\Core\Tests\Acceptance\Backend\Extensionmanager;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Codeception\Scenario;
 use Noerdisch\TestingFramework\Core\Acceptance\Step\Backend\Admin;
 
 /**
@@ -26,14 +28,15 @@ class InstalledExtensionsCest
      */
     public function _before(Admin $I)
     {
-        $I->useExistingSession();
+        $I->login();
         // Ensure main content frame is fully loaded, otherwise there are load-race-conditions
-        $I->switchToIFrame('list_frame');
-        $I->waitForText('Web Content Management System');
-        $I->switchToIFrame();
 
-        $I->click('Extensions', '#menu');
-        $I->switchToIFrame('list_frame');
+        $I->switchToIFrame();
+        $I->waitForElementVisible('#typo3-menu');
+        $I->click('Extensions', '#typo3-menu');
+
+        // switch to content iframe
+        $I->switchToIFrame('content');
         $I->waitForElementVisible('#typo3-extension-list');
     }
 
@@ -62,12 +65,17 @@ class InstalledExtensionsCest
 
     /**
      * @param Admin $I
+     * @param Scenario $scenario
      */
-    public function checkIfUploadFormAppears(Admin $I)
+    public function checkIfUploadFormAppears(Admin $I, Scenario $scenario)
     {
-        $I->cantSeeElement('.module-body .uploadForm');
-        $I->click('a[title="Upload Extension .t3x/.zip"]', '.module-docheader');
-        $I->seeElement('.module-body .uploadForm');
+        if ($I->isComposerMode()) {
+            $scenario->incomplete('Skip check if "' . __METHOD__ . '", because we are in composer mode');
+        } else {
+            $I->cantSeeElement('.module-body .uploadForm');
+            $I->click('a[title="Upload Extension .t3x/.zip"]', '.module-docheader');
+            $I->seeElement('.module-body .uploadForm');
+        }
     }
 
     /**
@@ -80,7 +88,7 @@ class InstalledExtensionsCest
         $I->switchToIFrame();
         $I->canSeeElement('#system_BelogLog');
 
-        $I->switchToIFrame('list_frame');
+        $I->switchToIFrame('content');
         $I->fillField('Tx_Extensionmanager_extensionkey', 'belog');
         $I->waitForElementVisible('//*[@id="typo3-extension-list"]/tbody/tr[@id="belog"]');
         $I->click('a[data-original-title="Deactivate"]', '//*[@id="typo3-extension-list"]/tbody/tr[@id="belog"]');
@@ -93,10 +101,10 @@ class InstalledExtensionsCest
 
         $I->amGoingTo('install extension belog');
         $I->switchToIFrame();
-        $I->canSeeElement('.modulemenu-item-link');
+        $I->canSeeElement('.typo3-module-menu-item-link');
         $I->cantSeeElement('#system_BelogLog');
 
-        $I->switchToIFrame('list_frame');
+        $I->switchToIFrame('content');
         $I->fillField('Tx_Extensionmanager_extensionkey', 'belog');
         $I->waitForElementVisible('//*[@id="typo3-extension-list"]/tbody/tr[@id="belog"]');
         $I->click('a[data-original-title="Activate"]', '//*[@id="typo3-extension-list"]/tbody/tr[@id="belog"]');

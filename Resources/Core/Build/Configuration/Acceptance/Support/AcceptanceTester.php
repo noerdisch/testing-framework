@@ -15,7 +15,7 @@
  * @method \Codeception\Lib\Friend haveFriend($name, $actorClass = null)
  *
  * @SuppressWarnings(PHPMD)
-*/
+ */
 class AcceptanceTester extends \Codeception\Actor
 {
     use _generated\AcceptanceTesterActions;
@@ -85,5 +85,25 @@ class AcceptanceTester extends \Codeception\Actor
         $I->waitForElement('.nav', 5);
 
         $I->saveSessionSnapshot('login');
+    }
+
+    /**
+     * Some tests not working when you TYPO3 instance is in composer mode.
+     * So we test this here and return a bool.
+     *
+     * Should be used for ExtensionManager related Cests.
+     *
+     * @return bool
+     */
+    public function isComposerMode()
+    {
+        $I = $this;
+
+        try {
+            $I->canSee('Composer mode');
+        } catch (PHPUnit_Framework_AssertionFailedError $f) {
+            return false;
+        }
+        return true;
     }
 }

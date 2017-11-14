@@ -1,4 +1,5 @@
 <?php
+
 namespace TYPO3\CMS\Core\Tests\Acceptance\Backend\Extensionmanager;
 
 /*
@@ -14,6 +15,7 @@ namespace TYPO3\CMS\Core\Tests\Acceptance\Backend\Extensionmanager;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Codeception\Scenario;
 use Facebook\WebDriver\WebDriverKeys;
 use Noerdisch\TestingFramework\Core\Acceptance\Step\Backend\Admin;
 
@@ -25,73 +27,98 @@ class GetExtensionsCest
     /**
      * @param Admin $I
      */
-    public function _before(Admin $I)
+    public function _before(Admin $I, Scenario $scenario)
     {
-        $I->useExistingSession();
+        $I->login();
         // Ensure main content frame is fully loaded, otherwise there are load-race-conditions
-        $I->switchToIFrame('list_frame');
-        $I->waitForText('Web Content Management System');
-        $I->switchToIFrame();
 
-        $I->click('Extensions', '#menu');
-        $I->switchToIFrame('list_frame');
+        $I->switchToIFrame();
+        $I->waitForElementVisible('#typo3-menu');
+        $I->click('Extensions', '#typo3-menu');
+
+        // switch to content iframe
+        $I->switchToIFrame('content');
         $I->waitForElementVisible('#typo3-extension-list');
 
-        $I->selectOption('[name="ExtensionManagerModuleMenu"]', 'Get Extensions');
-        $I->waitForElementVisible('#terTable_wrapper');
+        if ($I->isComposerMode()) {
+            $scenario->incomplete('Skip check if "' . __CLASS__ . '", because we are in composer mode');
+        } else {
+            $I->selectOption('[name="ExtensionManagerModuleMenu"]', 'Get Extensions');
+            $I->waitForElementVisible('#terTable_wrapper');
 
-        // We expect exact two extensions created from the Fixtures
-        $I->canSeeNumberOfElements('#terTable tbody tr', 2);
+            // We expect exact two extensions created from the Fixtures
+            $I->canSeeNumberOfElements('#terTable tbody tr', 2);
+        }
     }
 
     /**
      * @param Admin $I
+     * @param Scenario $scenario
      */
-    public function checkRetrievedExtensionsFromTerAreDisplayed(Admin $I)
+    public function checkRetrievedExtensionsFromTerAreDisplayed(Admin $I, Scenario $scenario)
     {
-        $I->see('superext');
-        $I->see('neededext');
+        if ($I->isComposerMode()) {
+            $scenario->incomplete('Skip check if "' . __METHOD__ . '", because we are in composer mode');
+        } else {
+            $I->see('superext');
+            $I->see('neededext');
+        }
     }
 
     /**
      * @param Admin $I
+     * @param Scenario $scenario
      */
-    public function checkPageBrowserDisplaysTwoRecords(Admin $I)
+    public function checkPageBrowserDisplaysTwoRecords(Admin $I, Scenario $scenario)
     {
-        $I->canSeeElement('.pagination-wrap');
-        $I->canSee('Records 1 - 2');
+        if ($I->isComposerMode()) {
+            $scenario->incomplete('Skip check if "' . __METHOD__ . '", because we are in composer mode');
+        } else {
+            $I->canSeeElement('.pagination-wrap');
+            $I->canSee('Records 1 - 2');
+        }
     }
 
     /**
      * @param Admin $I
+     * @param Scenario $scenario
      */
-    public function checkSearchFilterListFindsExtensionKey(Admin $I)
+    public function checkSearchFilterListFindsExtensionKey(Admin $I, Scenario $scenario)
     {
-        $I->fillField('input[name="tx_extensionmanager_tools_extensionmanagerextensionmanager[search]"]', 'superext');
-        $I->click('Go');
-        $I->waitForElementVisible('#terSearchTable');
-        $I->canSeeNumberOfElements('#terSearchTable tbody tr', 1);
-        $I->canSee('Super Extension');
+        if ($I->isComposerMode()) {
+            $scenario->incomplete('Skip check if "' . __METHOD__ . '", because we are in composer mode');
+        } else {
+            $I->fillField('input[name="tx_extensionmanager_tools_extensionmanagerextensionmanager[search]"]', 'superext');
+            $I->click('Go');
+            $I->waitForElementVisible('#terSearchTable');
+            $I->canSeeNumberOfElements('#terSearchTable tbody tr', 1);
+            $I->canSee('Super Extension');
 
-        $I->amGoingTo('search extension neededext and submit with enter');
+            $I->amGoingTo('search extension neededext and submit with enter');
 
-        $I->fillField('input[name="tx_extensionmanager_tools_extensionmanagerextensionmanager[search]"]', 'neededext');
-        $I->pressKey('input[name="tx_extensionmanager_tools_extensionmanagerextensionmanager[search]"]', WebDriverKeys::ENTER);
-        $I->waitForElementVisible('#terSearchTable');
-        $I->canSeeNumberOfElements('#terSearchTable tbody tr', 1);
-        $I->canSee('Needed Extension');
+            $I->fillField('input[name="tx_extensionmanager_tools_extensionmanagerextensionmanager[search]"]', 'neededext');
+            $I->pressKey('input[name="tx_extensionmanager_tools_extensionmanagerextensionmanager[search]"]', WebDriverKeys::ENTER);
+            $I->waitForElementVisible('#terSearchTable');
+            $I->canSeeNumberOfElements('#terSearchTable tbody tr', 1);
+            $I->canSee('Needed Extension');
+        }
     }
 
     /**
      * @param Admin $I
+     * @param Scenario $scenario
      */
-    public function checkSearchFilterListFindsPartOfExtensionKey(Admin $I)
+    public function checkSearchFilterListFindsPartOfExtensionKey(Admin $I, Scenario $scenario)
     {
-        $I->fillField('input[name="tx_extensionmanager_tools_extensionmanagerextensionmanager[search]"]', 'ext');
-        $I->click('Go');
-        $I->waitForElementVisible('#terSearchTable');
-        $I->canSeeNumberOfElements('#terSearchTable tbody tr', 2);
-        $I->canSee('Super Extension');
-        $I->canSee('Needed Extension');
+        if ($I->isComposerMode()) {
+            $scenario->incomplete('Skip check if "' . __METHOD__ . '", because we are in composer mode');
+        } else {
+            $I->fillField('input[name="tx_extensionmanager_tools_extensionmanagerextensionmanager[search]"]', 'ext');
+            $I->click('Go');
+            $I->waitForElementVisible('#terSearchTable');
+            $I->canSeeNumberOfElements('#terSearchTable tbody tr', 2);
+            $I->canSee('Super Extension');
+            $I->canSee('Needed Extension');
+        }
     }
 }
