@@ -29,6 +29,16 @@ class AcceptanceTester extends \Codeception\Actor
     protected $sessionCookie = '';
 
     /**
+     * @var string
+     */
+    protected $username = '';
+
+    /**
+     * @var string
+     */
+    protected $password = '';
+
+    /**
      * Use the existing database session from the fixture by setting the backend user cookie
      */
     public function useExistingSession()
@@ -53,5 +63,27 @@ class AcceptanceTester extends \Codeception\Actor
 
         // reload the page to have a logged in backend
         $I->amOnPage('/typo3/index.php');
+    }
+
+    /**
+     * Helper method for user login on backend login screen
+     */
+    public function login()
+    {
+        $I = $this;
+
+        // if snapshot exists - skipping login
+        if ($I->loadSessionSnapshot('login')) {
+            return;
+        }
+
+        $I->amOnPage('/typo3/index.php');
+        $I->waitForElement('#t3-username');
+        $I->fillField('#t3-username', $this->username);
+        $I->fillField('#t3-password', $this->password);
+        $I->click('#t3-login-submit-section > button');
+        $I->waitForElement('.nav', 5);
+
+        $I->saveSessionSnapshot('login');
     }
 }

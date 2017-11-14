@@ -26,4 +26,14 @@ class Editor extends \AcceptanceTester
      * @var string
      */
     protected $sessionCookie = 'ff83dfd81e20b34c27d3e97771a4525a';
+
+    /**
+     * @var string
+     */
+    protected $username = 'editor';
+
+    /**
+     * @var string
+     */
+    protected $password = 'password';
 }

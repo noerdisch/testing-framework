@@ -26,4 +26,14 @@ class Admin extends \AcceptanceTester
      * @var string
      */
     protected $sessionCookie = '886526ce72b86870739cc41991144ec1';
+
+    /**
+     * @var string
+     */
+    protected $username = 'admin';
+
+    /**
+     * @var string
+     */
+    protected $password = 'password';
 }
