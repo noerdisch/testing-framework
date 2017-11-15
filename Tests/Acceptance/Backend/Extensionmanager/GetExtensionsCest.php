@@ -1,6 +1,6 @@
 <?php
 
-namespace TYPO3\CMS\Core\Tests\Acceptance\Backend\Extensionmanager;
+namespace Noerdisch\TestingFramework\Tests\Acceptance\Backend\Extensionmanager;
 
 /*
  * This file is part of the TYPO3 CMS project.

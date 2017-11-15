@@ -1,6 +1,6 @@
 <?php
 
-namespace TYPO3\CMS\Core\Tests\Acceptance\Backend\BackendUser;
+namespace Noerdisch\TestingFramework\Tests\Acceptance\Backend\BackendUser;
 
 /*
  * This file is part of the TYPO3 CMS project.

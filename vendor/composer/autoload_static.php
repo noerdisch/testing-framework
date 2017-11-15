@@ -47,6 +47,7 @@ class ComposerStaticInita1ada698de71d4ac9544083ef1fce489
         ),
         'N' => 
         array (
+            'Noerdisch\\TestingFramework\\Tests\\' => 33,
             'Noerdisch\\TestingFramework\\' => 27,
         ),
         'G' => 
@@ -136,6 +137,10 @@ class ComposerStaticInita1ada698de71d4ac9544083ef1fce489
         'Psr\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
+        'Noerdisch\\TestingFramework\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/Tests',
         ),
         'Noerdisch\\TestingFramework\\' => 
         array (

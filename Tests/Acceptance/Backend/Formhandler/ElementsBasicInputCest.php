@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\CMS\Core\Tests\Acceptance\Backend\Formhandler;
+namespace Noerdisch\TestingFramework\Tests\Acceptance\Backend\Formhandler;
 
 /*
  * This file is part of the TYPO3 CMS project.

@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\CMS\Core\Tests\Acceptance\Backend\Template;
+namespace Noerdisch\TestingFramework\Tests\Acceptance\Backend\Template;
 
 /*
  * This file is part of the TYPO3 CMS project.

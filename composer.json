@@ -46,7 +46,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Noerdisch\\TestingFramework\\": "Classes/"
+      "Noerdisch\\TestingFramework\\": "Classes/",
+      "Noerdisch\\TestingFramework\\Tests\\": "Tests/"
     }
   }
 }

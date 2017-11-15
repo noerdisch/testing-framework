@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\CMS\Core\Tests\Acceptance\Backend\Login;
+namespace Noerdisch\TestingFramework\Tests\Acceptance\Backend\Login;
 
 /*
  * This file is part of the TYPO3 CMS project.
