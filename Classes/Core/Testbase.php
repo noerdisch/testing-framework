@@ -716,7 +716,7 @@ class Testbase
     protected function getVendorPathFromSymlink($symLink)
     {
         $linkSegments = explode('/', $symLink);
-        if (!in_array('vendor', $linkSegments, true)) {
+        if (!in_array('vendor', $linkSegments, true) && !in_array('typo3', $linkSegments, true)) {
             return '';
         }
 
@@ -729,7 +729,27 @@ class Testbase
             }
         }
 
+        if (in_array('typo3', $vendorSegments, true) && !in_array('vendor', $vendorSegments, true)) {
+            $vendorSegments = $this->adjustVendorPathSegmentsWhenContainsTypo3($vendorSegments);
+        }
+
         return realpath($this->getWebRoot() . implode('/', $vendorSegments));
+    }
+
+    /**
+     * If we have no vendor segment but the last is typo3, we replace typo3 with vendor. In a linked source the vendor
+     * folder should be next to the typo3 folder.
+     *
+     * @param array $vendorSegments
+     * @return array
+     */
+    protected function adjustVendorPathSegmentsWhenContainsTypo3(array $vendorSegments) {
+        $typo3SegmentIndex = array_search('typo3', $vendorSegments, true);
+        if ($typo3SegmentIndex !== false && $vendorSegments[$typo3SegmentIndex] === 'typo3') {
+            $vendorSegments[$typo3SegmentIndex] = 'vendor';
+        }
+
+        return $vendorSegments;
     }
 
     /**
