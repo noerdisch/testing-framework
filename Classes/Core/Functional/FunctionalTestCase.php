@@ -14,9 +14,6 @@ namespace Noerdisch\TestingFramework\Core\Functional;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
-use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use PHPUnit\Util\PHP\AbstractPhpProcess;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Cache\Backend\NullBackend;
@@ -195,7 +192,6 @@ abstract class FunctionalTestCase extends BaseTestCase
      * This method should be called with parent::setUp() in your test cases!
      *
      * @return void
-     * @throws \Doctrine\DBAL\DBALException
      */
     protected function setUp()
     {
@@ -282,14 +278,6 @@ abstract class FunctionalTestCase extends BaseTestCase
     {
         GeneralUtility::logDeprecatedFunction();
         return $GLOBALS['TYPO3_DB'];
-    }
-
-    /**
-     * @return ConnectionPool
-     */
-    protected function getConnectionPool()
-    {
-        return GeneralUtility::makeInstance(ConnectionPool::class);
     }
 
     /**
