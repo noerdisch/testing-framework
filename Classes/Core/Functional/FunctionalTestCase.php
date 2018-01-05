@@ -204,38 +204,38 @@ abstract class FunctionalTestCase extends BaseTestCase
         $this->instancePath = ORIGINAL_ROOT . 'typo3temp/var/tests/functional-' . $this->identifier;
         putenv('TYPO3_PATH_ROOT=' . $this->instancePath);
 
-        $testbase = new Testbase();
-        $testbase->defineTypo3ModeBe();
-        $testbase->definePackagesPath();
-        $testbase->setTypo3TestingContext();
-        if ($testbase->recentTestInstanceExists($this->instancePath)) {
+        $testBase = new Testbase();
+        $testBase->defineTypo3ModeBe();
+        $testBase->definePackagesPath();
+        $testBase->setTypo3TestingContext();
+        if ($testBase->recentTestInstanceExists($this->instancePath)) {
             // Reusing an existing instance. This typically happens for the second, third, ... test
             // in a test case, so environment is set up only once per test case.
-            $testbase->setUpBasicTypo3Bootstrap($this->instancePath);
-            $testbase->initializeTestDatabaseAndTruncateTables();
+            $testBase->setUpBasicTypo3Bootstrap($this->instancePath);
+            $testBase->initializeTestDatabaseAndTruncateTables();
             Bootstrap::getInstance()->initializeBackendRouter();
-            $testbase->loadExtensionTables();
+            $testBase->loadExtensionTables();
         } else {
-            $testbase->removeOldInstanceIfExists($this->instancePath);
+            $testBase->removeOldInstanceIfExists($this->instancePath);
             // Basic instance directory structure
-            $testbase->createDirectory($this->instancePath . '/fileadmin');
-            $testbase->createDirectory($this->instancePath . '/typo3temp/var/transient');
-            $testbase->createDirectory($this->instancePath . '/typo3temp/assets');
-            $testbase->createDirectory($this->instancePath . '/typo3conf/ext');
-            $testbase->createDirectory($this->instancePath . '/uploads');
+            $testBase->createDirectory($this->instancePath . '/fileadmin');
+            $testBase->createDirectory($this->instancePath . '/typo3temp/var/transient');
+            $testBase->createDirectory($this->instancePath . '/typo3temp/assets');
+            $testBase->createDirectory($this->instancePath . '/typo3conf/ext');
+            $testBase->createDirectory($this->instancePath . '/uploads');
             // Additionally requested directories
             foreach ($this->additionalFoldersToCreate as $directory) {
-                $testbase->createDirectory($this->instancePath . '/' . $directory);
+                $testBase->createDirectory($this->instancePath . '/' . $directory);
             }
-            $testbase->createLastRunTextfile($this->instancePath);
-            $testbase->setUpInstanceCoreLinks($this->instancePath);
-            $testbase->linkTestExtensionsToInstance($this->instancePath, $this->testExtensionsToLoad);
-            $testbase->linkPathsInTestInstance($this->instancePath, $this->pathsToLinkInTestInstance);
-            $localConfiguration['DB'] = $testbase->getOriginalDatabaseSettingsFromEnvironmentOrLocalConfiguration();
+            $testBase->createLastRunTextfile($this->instancePath);
+            $testBase->setUpInstanceCoreLinks($this->instancePath);
+            $testBase->linkTestExtensionsToInstance($this->instancePath, $this->testExtensionsToLoad);
+            $testBase->linkPathsInTestInstance($this->instancePath, $this->pathsToLinkInTestInstance);
+            $localConfiguration['DB'] = $testBase->getOriginalDatabaseSettingsFromEnvironmentOrLocalConfiguration();
             $originalDatabaseName = $localConfiguration['DB']['Connections']['Default']['dbname'];
             // Append the unique identifier to the base database name to end up with a single database per test case
             $localConfiguration['DB']['Connections']['Default']['dbname'] = $originalDatabaseName . '_ft' . $this->identifier;
-            $testbase->testDatabaseNameIsNotTooLong($originalDatabaseName, $localConfiguration);
+            $testBase->testDatabaseNameIsNotTooLong($originalDatabaseName, $localConfiguration);
             // Set some hard coded base settings for the instance. Those could be overruled by
             // $this->configurationToUseInTestInstance if needed again.
             $localConfiguration['SYS']['isInitialInstallationInProgress'] = false;
@@ -247,7 +247,7 @@ abstract class FunctionalTestCase extends BaseTestCase
             // @todo: This should be moved over to DB/Connections/Default/initCommands
             $localConfiguration['SYS']['setDBinit'] = 'SET SESSION sql_mode = \'STRICT_ALL_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_VALUE_ON_ZERO,NO_ENGINE_SUBSTITUTION,NO_ZERO_DATE,NO_ZERO_IN_DATE,ONLY_FULL_GROUP_BY\';';
             $localConfiguration['SYS']['caching']['cacheConfigurations']['extbase_object']['backend'] = NullBackend::class;
-            $testbase->setUpLocalConfiguration($this->instancePath, $localConfiguration, $this->configurationToUseInTestInstance);
+            $testBase->setUpLocalConfiguration($this->instancePath, $localConfiguration, $this->configurationToUseInTestInstance);
             $defaultCoreExtensionsToLoad = [
                 'core',
                 'backend',
@@ -256,12 +256,12 @@ abstract class FunctionalTestCase extends BaseTestCase
                 'extbase',
                 'install',
             ];
-            $testbase->setUpPackageStates($this->instancePath, $defaultCoreExtensionsToLoad, $this->coreExtensionsToLoad, $this->testExtensionsToLoad);
-            $testbase->setUpBasicTypo3Bootstrap($this->instancePath);
-            $testbase->setUpTestDatabase($localConfiguration['DB']['Connections']['Default']['dbname'], $originalDatabaseName);
+            $testBase->setUpPackageStates($this->instancePath, $defaultCoreExtensionsToLoad, $this->coreExtensionsToLoad, $this->testExtensionsToLoad);
+            $testBase->setUpBasicTypo3Bootstrap($this->instancePath);
+            $testBase->setUpTestDatabase($localConfiguration['DB']['Connections']['Default']['dbname'], $originalDatabaseName);
             Bootstrap::getInstance()->initializeBackendRouter();
-            $testbase->loadExtensionTables();
-            $testbase->createDatabaseStructure();
+            $testBase->loadExtensionTables();
+            $testBase->createDatabaseStructure();
         }
     }
 
