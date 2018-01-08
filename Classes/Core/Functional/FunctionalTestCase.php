@@ -195,6 +195,10 @@ abstract class FunctionalTestCase extends BaseTestCase
      */
     protected function setUp()
     {
+        /** @var Testbase $testBase */
+        $testBase = new Testbase();
+        $testBase->initializeClassLoader();
+
         if (!defined('ORIGINAL_ROOT')) {
             $this->markTestSkipped('Functional tests must be called through phpunit on CLI');
         }
@@ -204,13 +208,15 @@ abstract class FunctionalTestCase extends BaseTestCase
         $this->instancePath = ORIGINAL_ROOT . 'typo3temp/var/tests/functional-' . $this->identifier;
         putenv('TYPO3_PATH_ROOT=' . $this->instancePath);
 
-        $testBase = new Testbase();
+        $testBase->enableDisplayErrors();
+        $testBase->defineBaseConstants();
+        $testBase->initializeGlobalVariables();
         $testBase->defineTypo3ModeBe();
-        $testBase->definePackagesPath();
         $testBase->setTypo3TestingContext();
         if ($testBase->recentTestInstanceExists($this->instancePath)) {
             // Reusing an existing instance. This typically happens for the second, third, ... test
             // in a test case, so environment is set up only once per test case.
+            $testBase->definePackagesPath();
             $testBase->setUpBasicTypo3Bootstrap($this->instancePath);
             $testBase->initializeTestDatabaseAndTruncateTables();
             Bootstrap::getInstance()->initializeBackendRouter();
@@ -229,6 +235,7 @@ abstract class FunctionalTestCase extends BaseTestCase
             }
             $testBase->createLastRunTextfile($this->instancePath);
             $testBase->setUpInstanceCoreLinks($this->instancePath);
+            $testBase->definePackagesPath();
             $testBase->linkTestExtensionsToInstance($this->instancePath, $this->testExtensionsToLoad);
             $testBase->linkPathsInTestInstance($this->instancePath, $this->pathsToLinkInTestInstance);
             $localConfiguration['DB'] = $testBase->getOriginalDatabaseSettingsFromEnvironmentOrLocalConfiguration();
