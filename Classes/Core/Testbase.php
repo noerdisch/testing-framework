@@ -149,7 +149,7 @@ class Testbase
     {
         $instanceWebRoot = is_dir($instancePath) ? $instancePath : $this->getWebRoot();
         defined('PATH_site') ?: define('PATH_site', rtrim($instanceWebRoot, '\\/') . '/');
-        defined('PATH_thisScript') ?: define('PATH_thisScript', PATH_site . '/typo3/cli_dispatch.phpsh');
+        defined('PATH_thisScript') ?: define('PATH_thisScript', PATH_site . 'typo3/cli_dispatch.phpsh');
         $_SERVER['SCRIPT_NAME'] = PATH_thisScript;
 
         if (!file_exists(PATH_thisScript)) {
@@ -660,10 +660,9 @@ class Testbase
         $this->bootstrap->baseSetup();
         $this->bootstrap->loadConfigurationAndInitialize(true);
         $this->dumpClassLoadingInformation();
-        // @todo reenable it later and verify why the runner config needs to be in the envconf
-        //$this->bootstrap->loadTypo3LoadedExtAndExtLocalconf(true);
-        //    ->setFinalCachingFrameworkCacheConfiguration()
-        //    ->unsetReservedGlobalVariables();
+        $this->bootstrap->loadTypo3LoadedExtAndExtLocalconf(true)
+            ->setFinalCachingFrameworkCacheConfiguration()
+            ->unsetReservedGlobalVariables();
     }
 
     /**
