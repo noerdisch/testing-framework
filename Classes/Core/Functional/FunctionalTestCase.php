@@ -132,9 +132,7 @@ abstract class FunctionalTestCase extends BaseTestCase
      *
      * @var array
      */
-    protected $testExtensionsToLoad = [
-        'typo3conf/ext/tc_dataimport_processor',
-    ];
+    protected $testExtensionsToLoad = [];
 
     /**
      * Array of test/fixture folder or file paths that should be linked for a test.
@@ -379,12 +377,15 @@ abstract class FunctionalTestCase extends BaseTestCase
      *
      * @param string $path Absolute path to the XML file containing the data set to load
      * @return void
-     * @throws Exception
      */
     protected function importDataSet($path)
     {
-        $testbase = new Testbase();
-        $testbase->importXmlDatabaseFixture($path);
+        $testBase = new Testbase();
+        $localConfiguration['DB'] = $testBase->getOriginalDatabaseSettingsFromEnvironmentOrLocalConfiguration();
+        $originalDatabaseName = $localConfiguration['DB']['database'];
+        $localConfiguration['DB']['database'] = $originalDatabaseName . '_ft' . $this->identifier;
+        $testBase->setDatabaseName($localConfiguration['DB']['database']);
+        $testBase->importXmlDatabaseFixture($path);
     }
 
     /**
