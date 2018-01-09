@@ -213,6 +213,7 @@ abstract class FunctionalTestCase extends BaseTestCase
         $testBase->initializeGlobalVariables();
         $testBase->defineTypo3ModeBe();
         $testBase->setTypo3TestingContext();
+        $testBase->defineSitePath($this->instancePath);
         if ($testBase->recentTestInstanceExists($this->instancePath)) {
             // Reusing an existing instance. This typically happens for the second, third, ... test
             // in a test case, so environment is set up only once per test case.

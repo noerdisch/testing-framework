@@ -149,8 +149,8 @@ class Testbase
     public function defineSitePath($instancePath = '')
     {
         $instanceWebRoot = is_dir($instancePath) ? $instancePath : $this->getWebRoot();
-        defined('PATH_site') ?: define('PATH_site', $instanceWebRoot);
-        defined('PATH_thisScript') ?: define('PATH_thisScript', PATH_site . 'typo3/cli_dispatch.phpsh');
+        defined('PATH_site') ?: define('PATH_site', rtrim($instanceWebRoot, '\\/') . '/');
+        defined('PATH_thisScript') ?: define('PATH_thisScript', PATH_site . '/typo3/cli_dispatch.phpsh');
         $_SERVER['SCRIPT_NAME'] = PATH_thisScript;
 
         if (!file_exists(PATH_thisScript)) {
@@ -324,7 +324,7 @@ class Testbase
                     1376745645
                 );
             }
-            $destinationPath = $instancePath . 'typo3conf/ext/' . basename($absoluteExtensionPath);
+            $destinationPath = rtrim($instancePath, '\\/') . '/typo3conf/ext/' . basename($absoluteExtensionPath);
             $success = symlink($absoluteExtensionPath, $destinationPath);
             if (!$success) {
                 throw new \Exception(
