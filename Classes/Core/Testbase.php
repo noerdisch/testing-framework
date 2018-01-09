@@ -544,14 +544,16 @@ class Testbase
      * For functional and acceptance tests.
      *
      * @param string $instancePath Absolute path to test instance
-     * @param array $defaultCoreExtensionsToLoad Default list of core extensions to load
-     * @param array $additionalCoreExtensionsToLoad Additional core extensions to load
+     * @param array $defaultCoreSystemExtensionsToLoad Default list of core extensions to load (sysext)
+     * @param array $additionalCoreSystemExtensionsToLoad Additional core extensions to load (sysext)
+     * @param array array $additionalCoreExtensionsToLoad (ext)
      * @param array $testExtensionPaths Paths to extensions relative to document root
      * @throws \Exception
      */
     public function setUpPackageStates(
         $instancePath,
-        array $defaultCoreExtensionsToLoad,
+        array $defaultCoreSystemExtensionsToLoad,
+        array $additionalCoreSystemExtensionsToLoad,
         array $additionalCoreExtensionsToLoad,
         array $testExtensionPaths
     )
@@ -562,7 +564,15 @@ class Testbase
         ];
 
         // Register default list of extensions and set active
-        foreach ($defaultCoreExtensionsToLoad as $extensionName) {
+        foreach ($defaultCoreSystemExtensionsToLoad as $extensionName) {
+            $packageStates['packages'][$extensionName] = [
+                'packagePath' => 'typo3/sysext/' . $extensionName . '/',
+                'state' => 'active',
+            ];
+        }
+
+        // Register additional core system extensions and set active
+        foreach ($additionalCoreSystemExtensionsToLoad as $extensionName) {
             $packageStates['packages'][$extensionName] = [
                 'packagePath' => 'typo3/sysext/' . $extensionName . '/',
                 'state' => 'active',
@@ -572,7 +582,7 @@ class Testbase
         // Register additional core extensions and set active
         foreach ($additionalCoreExtensionsToLoad as $extensionName) {
             $packageStates['packages'][$extensionName] = [
-                'packagePath' => 'typo3/sysext/' . $extensionName . '/',
+                'packagePath' => 'typo3/ext/' . $extensionName . '/',
                 'state' => 'active',
             ];
         }

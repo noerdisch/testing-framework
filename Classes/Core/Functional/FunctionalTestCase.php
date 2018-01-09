@@ -94,6 +94,25 @@ abstract class FunctionalTestCase extends BaseTestCase
     protected $coreExtensionsToLoad = [];
 
     /**
+     * Core extensions to load.
+     *
+     * If the test case needs additional core extensions as requirement,
+     * they can be noted here and will be added to LocalConfiguration
+     * extension list and ext_tables.sql of those extensions will be applied.
+     *
+     * This property will stay empty in this abstract, so it is possible
+     * to just overwrite it in extending classes. Extensions noted here will
+     * be loaded for every test of a test case and it is not possible to change
+     * the list of loaded extensions between single tests of a test case.
+     *
+     * A default list of core extensions is always loaded.
+     *
+     * @see FunctionalTestCaseUtility $defaultActivatedCoreSystemExtensions
+     * @var array
+     */
+    protected $coreSystemExtensionsToLoad = [];
+
+    /**
      * Array of test/fixture extensions paths that should be loaded for a test.
      *
      * This property will stay empty in this abstract, so it is possible
@@ -114,7 +133,7 @@ abstract class FunctionalTestCase extends BaseTestCase
      * @var array
      */
     protected $testExtensionsToLoad = [
-        'typo3conf/ext/tc_dataimport_processor'
+        'typo3conf/ext/tc_dataimport_processor',
     ];
 
     /**
@@ -260,7 +279,7 @@ abstract class FunctionalTestCase extends BaseTestCase
             $localConfiguration['SYS']['setDBinit'] = 'SET SESSION sql_mode = \'STRICT_ALL_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_VALUE_ON_ZERO,NO_ENGINE_SUBSTITUTION,NO_ZERO_DATE,NO_ZERO_IN_DATE,ONLY_FULL_GROUP_BY\';';
             $localConfiguration['SYS']['caching']['cacheConfigurations']['extbase_object']['backend'] = NullBackend::class;
             $testBase->setUpLocalConfiguration($this->instancePath, $localConfiguration, $this->configurationToUseInTestInstance);
-            $defaultCoreExtensionsToLoad = [
+            $defaultCoreSystemExtensionsToLoad = [
                 'core',
                 'beuser',
                 'extbase',
@@ -283,7 +302,13 @@ abstract class FunctionalTestCase extends BaseTestCase
                 'scheduler',
                 'tstemplate',
             ];
-            $testBase->setUpPackageStates($this->instancePath, $defaultCoreExtensionsToLoad, $this->coreExtensionsToLoad, $this->testExtensionsToLoad);
+            $testBase->setUpPackageStates(
+                $this->instancePath,
+                $defaultCoreSystemExtensionsToLoad,
+                $this->coreSystemExtensionsToLoad,
+                $this->coreExtensionsToLoad,
+                $this->testExtensionsToLoad
+            );
             $testBase->setUpBasicTypo3Bootstrap($this->instancePath);
             $testBase->setUpTestDatabase($localConfiguration['DB']['database'], $originalDatabaseName);
             Bootstrap::getInstance()->initializeBackendRouter();
