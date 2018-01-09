@@ -661,9 +661,10 @@ class Testbase
         $this->bootstrap->baseSetup();
         $this->bootstrap->loadConfigurationAndInitialize(true);
         $this->dumpClassLoadingInformation();
-        $this->bootstrap->loadTypo3LoadedExtAndExtLocalconf(true)
-            ->setFinalCachingFrameworkCacheConfiguration()
-            ->unsetReservedGlobalVariables();
+        // @todo reenable it later and verify why the runner config needs to be in the envconf
+        //$this->bootstrap->loadTypo3LoadedExtAndExtLocalconf(true);
+        //    ->setFinalCachingFrameworkCacheConfiguration()
+        //    ->unsetReservedGlobalVariables();
     }
 
     /**
