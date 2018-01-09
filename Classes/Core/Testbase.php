@@ -20,7 +20,6 @@ use Noerdisch\TestingFramework\Service\DatabaseConnectionService;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
-use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -783,13 +782,11 @@ class Testbase
      */
     public function initializeTestDatabaseAndTruncateTables()
     {
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getConnectionByName(ConnectionPool::DEFAULT_CONNECTION_NAME);
-        $schemaManager = $connection->getSchemaManager();
+        /** @var DatabaseConnectionService $databaseConnectionService */
+        $databaseConnectionService = GeneralUtility::makeInstance(DatabaseConnectionService::class);
 
-        foreach ($schemaManager->listTables() as $table) {
-            $connection->truncate($table->getName());
-            self::resetTableSequences($connection, $table->getName());
+        foreach ($databaseConnectionService->listDatabases() as $database) {
+            $databaseConnectionService->truncateAllTables($database);
         }
     }
 

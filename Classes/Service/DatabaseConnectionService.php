@@ -108,6 +108,33 @@ class DatabaseConnectionService implements SingletonInterface
     }
 
     /**
+     * Truncates given database.
+     *
+     * @param string $databaseName
+     * @return void
+     * @throws \InvalidArgumentException
+     * @throws \BadFunctionCallException
+     * @throws \RuntimeException
+     */
+    public function truncateAllTables($databaseName)
+    {
+        if (!$this->databaseConnection) {
+            $this->initializeDatabaseConnection();
+        }
+
+        foreach ($this->databaseConnection->admin_get_tables() as $table) {
+            $result = $this->databaseConnection->exec_TRUNCATEquery($databaseName);
+
+            if ($result === FALSE) {
+                throw new \RuntimeException(
+                    'MySQL Error: Cannot truncate database: "' . $this->databaseConnection->sql_error() . '"!',
+                    1515465078
+                );
+            }
+        }
+    }
+
+    /**
      * Creates given database.
      *
      * @param string $databaseName
