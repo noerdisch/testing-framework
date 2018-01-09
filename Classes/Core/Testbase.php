@@ -281,8 +281,16 @@ class Testbase
      */
     public function setUpInstanceCoreLinks($instancePath)
     {
+        $sourceLink = '../../../../';
+        if (strpos($instancePath, 'typo3temp/var/tests/') !== false) {
+            // set symlink to the typo3 source based on test instance link
+            $newSourceLink = rtrim(strtr(dirname(dirname(dirname(dirname($instancePath)))), '\\', '/'), '/') . '/';
+            $newSourceLink .= 'typo3_src';
+            $sourceLink = is_link($newSourceLink) ? $newSourceLink : $sourceLink;
+        }
+
         $linksToSet = [
-            '../../../../' => $instancePath . '/typo3_src',
+            $sourceLink => $instancePath . '/typo3_src',
             'typo3_src/typo3' => $instancePath . '/typo3',
             'typo3_src/index.php' => $instancePath . '/index.php',
         ];
