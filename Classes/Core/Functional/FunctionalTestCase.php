@@ -113,7 +113,9 @@ abstract class FunctionalTestCase extends BaseTestCase
      *
      * @var array
      */
-    protected $testExtensionsToLoad = [];
+    protected $testExtensionsToLoad = [
+        'typo3conf/ext/tc_dataimport_processor'
+    ];
 
     /**
      * Array of test/fixture folder or file paths that should be linked for a test.
@@ -198,6 +200,7 @@ abstract class FunctionalTestCase extends BaseTestCase
         /** @var Testbase $testBase */
         $testBase = new Testbase();
         $testBase->initializeClassLoader();
+        $testBase->defineOriginalRootPath();
 
         if (!defined('ORIGINAL_ROOT')) {
             $this->markTestSkipped('Functional tests must be called through phpunit on CLI');
@@ -213,10 +216,10 @@ abstract class FunctionalTestCase extends BaseTestCase
         $testBase->initializeGlobalVariables();
         $testBase->defineTypo3ModeBe();
         $testBase->setTypo3TestingContext();
-        $testBase->defineSitePath($this->instancePath);
         if ($testBase->recentTestInstanceExists($this->instancePath)) {
             // Reusing an existing instance. This typically happens for the second, third, ... test
             // in a test case, so environment is set up only once per test case.
+            $testBase->defineSitePath($this->instancePath);
             $testBase->definePackagesPath();
             $testBase->setUpBasicTypo3Bootstrap($this->instancePath);
             $testBase->initializeTestDatabaseAndTruncateTables();
@@ -236,13 +239,14 @@ abstract class FunctionalTestCase extends BaseTestCase
             }
             $testBase->createLastRunTextfile($this->instancePath);
             $testBase->setUpInstanceCoreLinks($this->instancePath);
-            $testBase->definePackagesPath();
             $testBase->linkTestExtensionsToInstance($this->instancePath, $this->testExtensionsToLoad);
+            $testBase->defineSitePath($this->instancePath);
             $testBase->linkPathsInTestInstance($this->instancePath, $this->pathsToLinkInTestInstance);
             $localConfiguration['DB'] = $testBase->getOriginalDatabaseSettingsFromEnvironmentOrLocalConfiguration();
-            $originalDatabaseName = $localConfiguration['DB']['Connections']['Default']['dbname'];
+            $originalDatabaseName = $localConfiguration['DB']['database'];
             // Append the unique identifier to the base database name to end up with a single database per test case
-            $localConfiguration['DB']['Connections']['Default']['dbname'] = $originalDatabaseName . '_ft' . $this->identifier;
+            $localConfiguration['DB']['database'] = $originalDatabaseName . '_ft' . $this->identifier;
+            $testBase->setDatabaseName($localConfiguration['DB']['database']);
             $testBase->testDatabaseNameIsNotTooLong($originalDatabaseName, $localConfiguration);
             // Set some hard coded base settings for the instance. Those could be overruled by
             // $this->configurationToUseInTestInstance if needed again.
@@ -258,15 +262,30 @@ abstract class FunctionalTestCase extends BaseTestCase
             $testBase->setUpLocalConfiguration($this->instancePath, $localConfiguration, $this->configurationToUseInTestInstance);
             $defaultCoreExtensionsToLoad = [
                 'core',
-                'backend',
-                'frontend',
-                'lang',
+                'beuser',
                 'extbase',
+                'fluid',
+                'filelist',
+                'extensionmanager',
+                'lang',
+                'setup',
+                'rsaauth',
+                'saltedpasswords',
+                'backend',
+                'about',
+                'belog',
                 'install',
+                't3skin',
+                'frontend',
+                'recordlist',
+                'reports',
+                'sv',
+                'scheduler',
+                'tstemplate',
             ];
             $testBase->setUpPackageStates($this->instancePath, $defaultCoreExtensionsToLoad, $this->coreExtensionsToLoad, $this->testExtensionsToLoad);
             $testBase->setUpBasicTypo3Bootstrap($this->instancePath);
-            $testBase->setUpTestDatabase($localConfiguration['DB']['Connections']['Default']['dbname'], $originalDatabaseName);
+            $testBase->setUpTestDatabase($localConfiguration['DB']['database'], $originalDatabaseName);
             Bootstrap::getInstance()->initializeBackendRouter();
             $testBase->loadExtensionTables();
             $testBase->createDatabaseStructure();
