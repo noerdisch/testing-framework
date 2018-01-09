@@ -20,7 +20,6 @@ use Noerdisch\TestingFramework\Service\DatabaseConnectionService;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
-use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -149,7 +148,7 @@ class Testbase
     public function defineSitePath($instancePath = '')
     {
         $instanceWebRoot = is_dir($instancePath) ? $instancePath : $this->getWebRoot();
-        defined('PATH_site') ?: define('PATH_site', $instanceWebRoot);
+        defined('PATH_site') ?: define('PATH_site', rtrim($instanceWebRoot, '\\/') . '/');
         defined('PATH_thisScript') ?: define('PATH_thisScript', PATH_site . 'typo3/cli_dispatch.phpsh');
         $_SERVER['SCRIPT_NAME'] = PATH_thisScript;
 
@@ -281,8 +280,16 @@ class Testbase
      */
     public function setUpInstanceCoreLinks($instancePath)
     {
+        $sourceLink = '../../../../';
+        if (strpos($instancePath, 'typo3temp/var/tests/') !== false) {
+            // set symlink to the typo3 source based on test instance link
+            $newSourceLink = rtrim(strtr(dirname(dirname(dirname(dirname($instancePath)))), '\\', '/'), '/') . '/';
+            $newSourceLink .= 'typo3_src';
+            $sourceLink = is_link($newSourceLink) ? $newSourceLink : $sourceLink;
+        }
+
         $linksToSet = [
-            '../../../../' => $instancePath . '/typo3_src',
+            $sourceLink => $instancePath . '/typo3_src',
             'typo3_src/typo3' => $instancePath . '/typo3',
             'typo3_src/index.php' => $instancePath . '/index.php',
         ];
@@ -316,7 +323,7 @@ class Testbase
                     1376745645
                 );
             }
-            $destinationPath = $instancePath . 'typo3conf/ext/' . basename($absoluteExtensionPath);
+            $destinationPath = rtrim($instancePath, '\\/') . '/typo3conf/ext/' . basename($absoluteExtensionPath);
             $success = symlink($absoluteExtensionPath, $destinationPath);
             if (!$success) {
                 throw new \Exception(
@@ -774,13 +781,11 @@ class Testbase
      */
     public function initializeTestDatabaseAndTruncateTables()
     {
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getConnectionByName(ConnectionPool::DEFAULT_CONNECTION_NAME);
-        $schemaManager = $connection->getSchemaManager();
+        /** @var DatabaseConnectionService $databaseConnectionService */
+        $databaseConnectionService = GeneralUtility::makeInstance(DatabaseConnectionService::class);
 
-        foreach ($schemaManager->listTables() as $table) {
-            $connection->truncate($table->getName());
-            self::resetTableSequences($connection, $table->getName());
+        foreach ($databaseConnectionService->listDatabases() as $database) {
+            $databaseConnectionService->truncateAllTables($database);
         }
     }
 
